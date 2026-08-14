@@ -1,0 +1,16 @@
+{
+    "name": "TenRush.Managers",
+    "rootNamespace": "TenRush.Managers",
+    "references": [
+        "TenRush.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,20 @@
+{
+    "name": "TenRush.Editor",
+    "rootNamespace": "TenRush.Editor",
+    "references": [
+        "TenRush.Core",
+        "TenRush.Managers",
+        "TenRush.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>텐매치</title>
+<style>
+  :root{
+    --bg: #14172b;
+    --bg-2: #1c2040;
+    --cell-bg: #20244a;
+    --cell-border: #323874;
+    --ink: #eef0ff;
+    --sub: #8b90c4;
+    --danger: #ff5d7a;
+    --accent: #6ee7b7;
+    --select: #fde68a;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: radial-gradient(circle at 50% -10%, var(--bg-2), var(--bg) 60%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Pretendard, sans-serif;
+    color: var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh;
+    padding: 16px;
+  }
+  #app{ width:100%; max-width:360px; display:flex; flex-direction:column; gap:14px; }
+
+  .hud{ display:flex; justify-content:space-between; align-items:flex-end; }
+  .hud .label{ font-size:11px; letter-spacing:.14em; color:var(--sub); font-weight:700; }
+  .hud .value{ font-size:26px; font-weight:800; line-height:1; }
+  .hud .block.right{ text-align:right; }
+
+  .timebar-wrap{ height:8px; border-radius:6px; background: rgba(255,255,255,.08); overflow:hidden; }
+  .timebar{ height:100%; width:100%; background: var(--accent); transition: width .3s linear, background .3s ease; }
+  .timebar.warn{ background: var(--danger); }
+
+  .combo{
+    text-align:center; font-size:13px; font-weight:800; color: var(--select);
+    height:18px; opacity:0; transition: opacity .15s ease;
+  }
+  .combo.show{ opacity:1; }
+
+  .board{
+    display:grid;
+    grid-template-columns: repeat(6, 50px);
+    grid-auto-rows: 50px;
+    gap:6px;
+    justify-content:center;
+    background: rgba(0,0,0,.18);
+    border-radius:16px; padding:8px;
+    border:1px solid var(--cell-border);
+  }
+  .cell{
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:18px; color:#0d1024;
+    box-shadow: 0 3px 0 rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.35);
+    cursor:pointer;
+    transition: transform .12s ease, box-shadow .12s ease, opacity .14s ease;
+  }
+  .cell.selected{
+    transform: scale(1.08);
+    box-shadow: 0 0 0 3px var(--select), 0 3px 0 rgba(0,0,0,.25);
+  }
+  .cell.clearing{ opacity:0; transform: scale(.4) rotate(12deg); }
+  .cell.mismatch{ animation: shake .28s ease; }
+  .cell.dropin{ animation: dropIn .22s ease; }
+
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-4px); }
+    75%{ transform: translateX(4px); }
+  }
+  @keyframes dropIn{
+    from{ transform: translateY(-16px); opacity:0; }
+    to{ transform: translateY(0); opacity:1; }
+  }
+
+  .hint{ text-align:center; font-size:12px; color:var(--sub); }
+
+  .overlay{
+    position:fixed; inset:0; background: rgba(10,11,26,.82);
+    display:flex; align-items:center; justify-content:center;
+    z-index:20;
+  }
+  .overlay.hidden{ display:none; }
+  .card{
+    background: var(--cell-bg); border:1px solid var(--cell-border);
+    border-radius:18px; padding:28px 30px; text-align:center; min-width:220px;
+  }
+  .card .title{ font-size:20px; font-weight:800; margin-bottom:6px; }
+  .card .sub{ font-size:13px; color:var(--sub); margin-bottom:18px; }
+  .card button{
+    width:100%; padding:12px; border-radius:12px; border:none;
+    background: var(--accent); color:#0d1024; font-weight:800; font-size:15px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="hud">
+    <div class="block">
+      <div class="label">SCORE</div>
+      <div class="value" id="score">0</div>
+    </div>
+    <div class="block right">
+      <div class="label">TIME</div>
+      <div class="value" id="time">60</div>
+    </div>
+  </div>
+
+  <div class="timebar-wrap"><div class="timebar" id="timebar"></div></div>
+  <div class="combo" id="combo"></div>
+
+  <div class="board" id="board"></div>
+
+  <div class="hint">더해서 10이 되는 타일 두 개를 탭하세요</div>
+</div>
+
+<div class="overlay hidden" id="overlay">
+  <div class="card">
+    <div class="title">TIME UP</div>
+    <div class="sub">SCORE <span id="finalScore">0</span></div>
+    <button id="retryBtn">다시하기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ROWS = 7, COLS = 6;
+  const ROUND_TIME = 60;
+
+  const boardEl = document.getElementById('board');
+  const scoreEl = document.getElementById('score');
+  const timeEl = document.getElementById('time');
+  const timebarEl = document.getElementById('timebar');
+  const comboEl = document.getElementById('combo');
+  const overlayEl = document.getElementById('overlay');
+  const finalScoreEl = document.getElementById('finalScore');
+
+  let grid, cellEls, selected, locked, score, timeLeft, timerId, comboCount, lastMatchAt, gameOver;
+
+  function rand19(){ return 1 + Math.floor(Math.random()*9); }
+  function colorFor(v){ return `hsl(${(v-1)*40}, 70%, 60%)`; }
+
+  function buildBoardDom(){
+    boardEl.innerHTML = '';
+    cellEls = [];
+    for(let r=0;r<ROWS;r++){
+      cellEls.push([]);
+      for(let c=0;c<COLS;c++){
+        const el = document.createElement('div');
+        el.className = 'cell';
+        el.addEventListener('click', () => onCellClick(r,c));
+        boardEl.appendChild(el);
+        cellEls[r].push(el);
+      }
+    }
+  }
+
+  function randomGrid(){
+    const g = [];
+    for(let r=0;r<ROWS;r++){
+      const row = [];
+      for(let c=0;c<COLS;c++) row.push(rand19());
+      g.push(row);
+    }
+    return g;
+  }
+
+  function hasValidPair(g){
+    const flat = [];
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) flat.push(g[r][c]);
+    for(let i=0;i<flat.length;i++){
+      for(let j=i+1;j<flat.length;j++){
+        if(flat[i]+flat[j]===10) return true;
+      }
+    }
+    return false;
+  }
+
+  function ensurePlayable(){
+    let guard = 0;
+    while(!hasValidPair(grid) && guard < 50){
+      grid = randomGrid();
+      guard++;
+    }
+  }
+
+  function renderCell(r,c,{animateDrop}={}){
+    const el = cellEls[r][c];
+    const v = grid[r][c];
+    el.textContent = v;
+    el.style.background = colorFor(v);
+    el.classList.remove('clearing','mismatch','selected','dropin');
+    if(animateDrop){
+      // restart animation
+      void el.offsetWidth;
+      el.classList.add('dropin');
+    }
+  }
+
+  function renderAll(){
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) renderCell(r,c);
+  }
+
+  function setSelected(r,c){
+    selected = {row:r, col:c};
+    cellEls[r][c].classList.add('selected');
+  }
+  function clearSelection(){
+    if(selected) cellEls[selected.row][selected.col].classList.remove('selected');
+    selected = null;
+  }
+
+  function flashMismatch(a,b){
+    [a,b].forEach(p => {
+      const el = cellEls[p.row][p.col];
+      el.classList.remove('mismatch');
+      void el.offsetWidth;
+      el.classList.add('mismatch');
+    });
+  }
+
+  function onCellClick(r,c){
+    if(gameOver || locked) return;
+
+    if(selected && selected.row===r && selected.col===c){
+      clearSelection();
+      return;
+    }
+    if(!selected){
+      setSelected(r,c);
+      return;
+    }
+    const sum = grid[selected.row][selected.col] + grid[r][c];
+    if(sum === 10){
+      doMatch(selected, {row:r,col:c});
+    } else {
+      flashMismatch(selected, {row:r,col:c});
+      clearSelection();
+      setSelected(r,c);
+    }
+  }
+
+  function doMatch(a,b){
+    locked = true;
+    cellEls[a.row][a.col].classList.add('clearing');
+    cellEls[b.row][b.col].classList.add('clearing');
+    clearSelection();
+
+    const now = performance.now();
+    if(lastMatchAt && now - lastMatchAt < 1500){
+      comboCount++;
+    } else {
+      comboCount = 1;
+    }
+    lastMatchAt = now;
+    const gained = 10 + (comboCount-1)*5;
+    score += gained;
+    scoreEl.textContent = String(score);
+
+    if(comboCount >= 2){
+      comboEl.textContent = `COMBO x${comboCount}  +${gained}`;
+      comboEl.classList.add('show');
+      clearTimeout(comboEl._t);
+      comboEl._t = setTimeout(() => comboEl.classList.remove('show'), 700);
+    }
+
+    setTimeout(() => {
+      // 제거된 자리는 다른 타일을 당겨오지 않고, 그 자리에 바로 새 숫자로 채운다.
+      grid[a.row][a.col] = rand19();
+      grid[b.row][b.col] = rand19();
+
+      if(hasValidPair(grid)){
+        renderCell(a.row, a.col, {animateDrop:true});
+        renderCell(b.row, b.col, {animateDrop:true});
+      } else {
+        grid = randomGrid();
+        ensurePlayable();
+        renderAll();
+      }
+      locked = false;
+    }, 180);
+  }
+
+  function tick(){
+    timeLeft--;
+    timeEl.textContent = String(Math.max(timeLeft,0));
+    const pct = Math.max(timeLeft,0) / ROUND_TIME * 100;
+    timebarEl.style.width = pct + '%';
+    timebarEl.classList.toggle('warn', timeLeft <= 10);
+    if(timeLeft <= 0){
+      endGame();
+    }
+  }
+
+  function endGame(){
+    gameOver = true;
+    clearInterval(timerId);
+    finalScoreEl.textContent = String(score);
+    overlayEl.classList.remove('hidden');
+  }
+
+  function init(){
+    gameOver = false; locked = false;
+    selected = null; score = 0; comboCount = 0; lastMatchAt = 0;
+    timeLeft = ROUND_TIME;
+    scoreEl.textContent = '0';
+    timeEl.textContent = String(ROUND_TIME);
+    timebarEl.style.width = '100%';
+    timebarEl.classList.remove('warn');
+    comboEl.classList.remove('show');
+    overlayEl.classList.add('hidden');
+
+    grid = randomGrid();
+    ensurePlayable();
+    buildBoardDom();
+    renderAll();
+
+    clearInterval(timerId);
+    timerId = setInterval(tick, 1000);
+  }
+
+  document.getElementById('retryBtn').addEventListener('click', init);
+
+  init();
+})();
+</script>
+
+</body>
+</html>
