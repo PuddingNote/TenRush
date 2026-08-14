@@ -19,17 +19,25 @@ namespace TenRush.UI
         public static readonly Color Accent = HexColor("#6EE7B7");
         public static readonly Color Select = HexColor("#FDE68A");
 
-        public const float TileSize = 138f;
-        public const float TileSpacing = 10f;
+        public const float TileSize = 152f;
+        public const float TileSpacing = 12f;
         public const float TileCornerBoost = 1.08f; // 선택 시 살짝 커지는 배율
 
-        public const float HudValueFontSize = 56f;
-        public const float HudLabelFontSize = 24f;
-        public const float TileFontSize = 44f;
-        public const float ComboFontSize = 32f;
-        public const float TitleFontSize = 96f;
-        public const float ButtonFontSize = 40f;
-        public const float HintFontSize = 26f;
+        public const float HudValueFontSize = 72f;
+        public const float HudLabelFontSize = 32f;
+        public const float TileFontSize = 52f;
+        public const float ComboFontSize = 40f;
+        public const float TitleFontSize = 140f;
+        public const float ButtonFontSize = 60f;
+        public const float HintFontSize = 50f;
+        public const float DialogMessageFontSize = 54f;
+
+        public const float HudMargin = 56f; // 화면 모서리로부터 스코어/타이머가 떨어지는 여백
+
+        // 확인창/게임오버의 "왼쪽·오른쪽 버튼 한 줄" 배치에 쓰는 공용 크기.
+        public const float DialogButtonWidth = 340f;
+        public const float DialogButtonHeight = 110f;
+        public const float DialogButtonRowOffsetX = 190f; // 카드 중앙에서 좌우로 떨어지는 거리(버튼 사이 간격 40px)
 
         public const float ClearAnimSeconds = 0.18f; // 프로토타입 setTimeout(180ms)과 동일
         public const float DropInAnimSeconds = 0.16f;

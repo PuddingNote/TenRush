@@ -27,6 +27,29 @@ namespace TenRush.UI
             return canvas;
         }
 
+        /// <summary>
+        /// 기기 화면비가 9:16이 아니어도(태블릿, 늘어난 화면 등) 실제 게임 화면은
+        /// 항상 1080x1920 비율로 고정하고, 남는 공간은 검은 여백(letterbox)으로
+        /// 채운다. 반환된 RectTransform 밑에 실제 UI를 지으면 된다.
+        /// </summary>
+        public static RectTransform CreateLetterboxedContentRoot(Transform canvasTransform)
+        {
+            var background = CreatePanel(canvasTransform, "LetterboxBackground", Color.black);
+            Stretch(background);
+
+            // AspectRatioFitter의 FitInParent 모드는 앵커가 스트레치(0,0)-(1,1)가 아니라
+            // 한 점(중앙)이어야 sizeDelta를 실제 크기로 취급해 정상 동작한다.
+            var contentRoot = CreatePanel(canvasTransform, "ContentRoot", Color.clear);
+            SetAnchor(contentRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            SetAnchoredPosition(contentRoot, 0f, 0f);
+
+            var fitter = contentRoot.gameObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fitter.aspectRatio = 1080f / 1920f;
+
+            return contentRoot;
+        }
+
         public static EventSystem CreateEventSystem()
         {
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));

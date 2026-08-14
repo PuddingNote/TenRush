@@ -15,17 +15,33 @@ namespace TenRush.UI
         {
             UiFactory.CreateEventSystem();
             var canvas = UiFactory.CreateRootCanvas("RootCanvas", out _);
+            var contentRoot = UiFactory.CreateLetterboxedContentRoot(canvas.transform);
 
-            ShowTitle(canvas.transform);
+            // AspectRatioFitter는 실제 레이아웃을 다음 캔버스 리빌드 때 계산한다.
+            // 그 전에 자식 UI가 contentRoot.rect 크기를 읽으면(타이머 바 등) 값이
+            // 아직 기본값일 수 있어서, 여기서 한 번 강제로 즉시 계산시켜 둔다.
+            Canvas.ForceUpdateCanvases();
+
+            ShowTitle(contentRoot);
         }
 
         private static void ShowTitle(Transform root)
         {
             TitleScreen title = null;
-            title = TitleScreen.Create(root, () =>
+            title = TitleScreen.Create(root, onStart: () =>
             {
                 Object.Destroy(title.gameObject);
-                GameplayScreen.Create(root);
+                ShowGameplay(root);
+            });
+        }
+
+        private static void ShowGameplay(Transform root)
+        {
+            GameplayScreen screen = null;
+            screen = GameplayScreen.Create(root, onExitToTitle: () =>
+            {
+                Object.Destroy(screen.gameObject);
+                ShowTitle(root);
             });
         }
     }

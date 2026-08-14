@@ -1,6 +1,7 @@
 using TenRush.Core;
 using TenRush.Core.Model;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TenRush.UI.Views
 {
@@ -17,17 +18,21 @@ namespace TenRush.UI.Views
         private GameOverOverlay _gameOverOverlay;
         private bool _gameOverShown;
 
-        public static GameplayScreen Create(Transform parent)
+        private System.Action _onExitToTitle;
+        private bool _confirmDialogOpen;
+
+        public static GameplayScreen Create(Transform parent, System.Action onExitToTitle)
         {
             var rootRect = UiFactory.CreatePanel(parent, "GameplayScreen", UiTheme.Background);
             UiFactory.Stretch(rootRect);
             var screen = rootRect.gameObject.AddComponent<GameplayScreen>();
+            screen._onExitToTitle = onExitToTitle;
 
             screen._round = new GameRound();
 
             var boardRect = UiFactory.CreatePanel(rootRect, "BoardAnchor", Color.clear);
             UiFactory.SetAnchor(boardRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            UiFactory.SetAnchoredPosition(boardRect, 0f, -40f);
+            UiFactory.SetAnchoredPosition(boardRect, 0f, -150f);
             UiFactory.SetSize(boardRect, 0f, 0f);
 
             screen._board = BoardView.Create(boardRect, screen._round);
@@ -37,23 +42,34 @@ namespace TenRush.UI.Views
             screen._hud.SetScore(0);
             screen._hud.SetTime(GridConstants.RoundTimeSeconds);
 
-            screen._gameOverOverlay = GameOverOverlay.Create(rootRect, screen.OnRetryRequested);
+            screen._gameOverOverlay = GameOverOverlay.Create(rootRect, screen.OnRetryRequested, () => onExitToTitle?.Invoke());
 
             return screen;
         }
 
         private void Update()
         {
-            if (_round.IsGameOver)
-                return;
-
-            _round.Tick(Time.deltaTime);
-            _hud.SetTime(_round.TimeRemainingSeconds);
-
-            if (_round.IsGameOver && !_gameOverShown)
+            if (!_round.IsGameOver)
             {
-                _gameOverShown = true;
-                _gameOverOverlay.Show(_round.Score);
+                _round.Tick(Time.deltaTime);
+                _hud.SetTime(_round.TimeRemainingSeconds);
+
+                if (_round.IsGameOver && !_gameOverShown)
+                {
+                    _gameOverShown = true;
+                    _gameOverOverlay.Show(_round.Score);
+                }
+            }
+
+            if (!_gameOverShown && !_confirmDialogOpen && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                _confirmDialogOpen = true;
+                ConfirmDialog.Create(
+                    transform,
+                    "Return to title?",
+                    "TITLE",
+                    () => _onExitToTitle?.Invoke(),
+                    onClosed: () => _confirmDialogOpen = false);
             }
         }
 

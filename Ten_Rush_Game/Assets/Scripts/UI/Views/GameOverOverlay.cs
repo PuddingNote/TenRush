@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 namespace TenRush.UI.Views
 {
-    /// <summary>시간 종료 시 뜨는 반투명 오버레이. 최종 점수 + 다시하기 버튼.</summary>
+    /// <summary>시간 종료 시 뜨는 반투명 오버레이. 최종 점수 + MAIN MENU(왼쪽)/RETRY(오른쪽) 버튼.</summary>
     public sealed class GameOverOverlay : MonoBehaviour
     {
         private TextMeshProUGUI _finalScoreValue;
 
-        public static GameOverOverlay Create(Transform parent, Action onRetry)
+        public static GameOverOverlay Create(Transform parent, Action onRetry, Action onMainMenu)
         {
             var rootRect = UiFactory.CreatePanel(parent, "GameOverOverlay", new Color(0.04f, 0.04f, 0.1f, 0.82f));
             UiFactory.Stretch(rootRect);
@@ -18,22 +18,29 @@ namespace TenRush.UI.Views
 
             var cardRect = UiFactory.CreatePanel(rootRect, "Card", UiTheme.BoardBackground);
             UiFactory.SetAnchor(cardRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            UiFactory.SetSize(cardRect, 640f, 420f);
+            UiFactory.SetSize(cardRect, 840f, 560f);
 
-            var title = UiFactory.CreateText(cardRect, "Title", "TIME UP", 56f, UiTheme.Ink);
+            var title = UiFactory.CreateText(cardRect, "Title", "TIME UP", 72f, UiTheme.Ink);
             UiFactory.SetAnchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
-            UiFactory.SetAnchoredPosition(title.rectTransform, 0f, -60f);
-            UiFactory.SetSize(title.rectTransform, 560f, 80f);
+            UiFactory.SetAnchoredPosition(title.rectTransform, 0f, -90f);
+            UiFactory.SetSize(title.rectTransform, 700f, 100f);
 
             overlay._finalScoreValue = UiFactory.CreateText(cardRect, "FinalScore", "SCORE 0", UiTheme.HintFontSize, UiTheme.SubInk);
             UiFactory.SetAnchor(overlay._finalScoreValue.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
-            UiFactory.SetAnchoredPosition(overlay._finalScoreValue.rectTransform, 0f, -140f);
-            UiFactory.SetSize(overlay._finalScoreValue.rectTransform, 560f, 50f);
+            UiFactory.SetAnchoredPosition(overlay._finalScoreValue.rectTransform, 0f, -210f);
+            UiFactory.SetSize(overlay._finalScoreValue.rectTransform, 700f, 70f);
 
-            var retryButton = UiFactory.CreateButton(cardRect, "RetryButton", "RETRY", 320f, 100f, UiTheme.Accent, Color.black, UiTheme.ButtonFontSize);
+            // MAIN MENU(왼쪽) / RETRY(오른쪽) 한 줄 배치.
+            var mainMenuButton = UiFactory.CreateButton(cardRect, "MainMenuButton", "MAIN MENU", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.SubInk, Color.black, UiTheme.ButtonFontSize);
+            var mainMenuRect = (RectTransform)mainMenuButton.transform;
+            UiFactory.SetAnchor(mainMenuRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            UiFactory.SetAnchoredPosition(mainMenuRect, -UiTheme.DialogButtonRowOffsetX, -160f);
+            mainMenuButton.onClick.AddListener(() => onMainMenu?.Invoke());
+
+            var retryButton = UiFactory.CreateButton(cardRect, "RetryButton", "RETRY", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Accent, Color.black, UiTheme.ButtonFontSize);
             var retryRect = (RectTransform)retryButton.transform;
-            UiFactory.SetAnchor(retryRect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
-            UiFactory.SetAnchoredPosition(retryRect, 0f, 60f);
+            UiFactory.SetAnchor(retryRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            UiFactory.SetAnchoredPosition(retryRect, UiTheme.DialogButtonRowOffsetX, -160f);
             retryButton.onClick.AddListener(() => onRetry?.Invoke());
 
             overlay.gameObject.SetActive(false);
