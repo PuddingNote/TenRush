@@ -22,11 +22,13 @@ namespace TenRush.Managers
 
         [Header("SFX")]
         [SerializeField] private AudioClip matchSfx;
+        [SerializeField] private AudioClip buttonClickSfx;
         [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
 
         public AudioClip BgmClip => bgmClip;
         public float BgmVolume => bgmVolume;
         public AudioClip MatchSfx => matchSfx;
+        public AudioClip ButtonClickSfx => buttonClickSfx;
         public float SfxVolume => sfxVolume;
     }
 }

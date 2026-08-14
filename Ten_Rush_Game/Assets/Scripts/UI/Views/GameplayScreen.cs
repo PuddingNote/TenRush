@@ -24,7 +24,7 @@ namespace TenRush.UI.Views
 
         public static GameplayScreen Create(Transform parent, System.Action onExitToTitle)
         {
-            var rootRect = UiFactory.CreatePanel(parent, "GameplayScreen", UiTheme.Background);
+            var rootRect = UiFactory.CreatePanel(parent, "GameplayScreen", UiTheme.Background, UiSprites.Background);
             UiFactory.Stretch(rootRect);
             var screen = rootRect.gameObject.AddComponent<GameplayScreen>();
             screen._onExitToTitle = onExitToTitle;

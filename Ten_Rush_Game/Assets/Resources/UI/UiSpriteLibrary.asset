@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea9215d68b4cea84689387d3996e3614, type: 3}
+  m_Name: UiSpriteLibrary
+  m_EditorClassIdentifier: TenRush.UI::TenRush.UI.UiSpriteLibrary
+  tileSprite: {fileID: -5112746258621203808, guid: 9951e84a137a00f4cb125117db9114ca, type: 3}
+  selectionBorderSprite: {fileID: -751864590083225810, guid: 5c779642554f37247977c6c2ed2e8f71, type: 3}
+  buttonSprite: {fileID: -1149988141224588209, guid: ce4788fa398702843a73a39bf88d654a, type: 3}
+  dialogSprite: {fileID: -1149988141224588209, guid: ce4788fa398702843a73a39bf88d654a, type: 3}
+  backgroundSprite: {fileID: -5112746258621203808, guid: 9951e84a137a00f4cb125117db9114ca, type: 3}

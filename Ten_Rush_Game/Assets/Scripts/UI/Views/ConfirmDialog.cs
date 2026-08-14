@@ -27,7 +27,7 @@ namespace TenRush.UI.Views
             var dialog = rootRect.gameObject.AddComponent<ConfirmDialog>();
             dialog._onClosed = onClosed;
 
-            var cardRect = UiFactory.CreatePanel(rootRect, "Card", UiTheme.BoardBackground);
+            var cardRect = UiFactory.CreatePanel(rootRect, "Card", UiTheme.BoardBackground, UiSprites.Dialog);
             UiFactory.SetAnchor(cardRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             UiFactory.SetSize(cardRect, 840f, 420f);
 

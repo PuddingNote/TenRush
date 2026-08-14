@@ -21,7 +21,10 @@ namespace TenRush.UI
 
         public const float TileSize = 152f;
         public const float TileSpacing = 12f;
-        public const float TileCornerBoost = 1.08f; // 선택 시 살짝 커지는 배율
+
+        // 선택 시 타일 자체를 확대하는 대신, 이 값만큼 더 큰 테두리 스프라이트를
+        // 타일 위에 덧씌운다(2026-08-14 변경 — 선택 테두리 이미지 도입).
+        public const float SelectionBorderPadding = 5f;
 
         public const float HudValueFontSize = 72f;
         public const float HudLabelFontSize = 32f;

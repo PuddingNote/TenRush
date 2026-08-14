@@ -113,6 +113,55 @@
   리스너를 직접 만들어 둔다(어떤 씬에 붙여도 동작하게 하려는 `AppRoot`의
   설계 원칙과 동일).
 
+## 2026-08-14 스프라이트 적용 + Settings 화면 + 선택 테두리 방식 변경
+
+- **스프라이트도 AudioLibrary와 동일한 패턴(ScriptableObject + Resources.Load)으로
+  인스펙터 노출.** `UiSpriteLibrary`(`TenRush.UI`)에 Tile/SelectionBorder/Button/
+  Dialog/Background 슬롯. `Assets/Sprites/`의 흰색 PNG 3종
+  (`white_square_128`, `white_square_rounded_128`, `line_box_white_square_128`)은
+  스프라이트 모드가 Multiple이라(9-slice border 40px 이미 세팅돼 있음)
+  `Resources.Load<Sprite>()`로 직접 못 읽어서(서브 스프라이트 이름 문제)
+  ScriptableObject 필드에 직접 끌어다 놓는 방식을 그대로 씀. **Claude Code가
+  이 에셋 자체를 만들 수는 없음(에디터 자동화 불가) — 사용자가
+  `Create → TenRush → UI Sprite Library`로 만들고 `Assets/Resources/UI/UiSpriteLibrary.asset`
+  경로에 저장 후 5개 슬롯에 지정된 파일을 끌어다 놓아야 함.** 에셋이 없거나
+  슬롯이 비어 있으면 `UiFactory`가 스프라이트 없이 기존 단색으로 그림(안 깨짐).
+  `UiFactory.CreatePanel`이 스프라이트를 받으면 `Image.Type.Sliced`로 그려서
+  버튼마다 크기가 달라도 모서리가 안 뭉개지게 함.
+- **타일 선택 표시 방식 변경**: 타일을 확대하는 방식(`TileCornerBoost`, Unity
+  기본 `Outline` 컴포넌트) → 타일보다 `UiTheme.SelectionBorderPadding`(18px)만큼
+  큰 테두리 스프라이트(`line_box_white_square_128`)를 덧씌워 켜고 끄는 방식으로
+  교체. 색은 `UiTheme.Select`(기존 선택/콤보 색과 동일 톤)를 그대로 재사용해서
+  타일 색상(HSL 무지개 전체)과 안 섞이면서 일관성 유지.
+- **메인 화면에 SETTINGS 버튼 추가**(START 왼쪽, 한 줄 배치). "SETTINGS" 라벨이
+  길어서 START도 같이 `DialogButtonFontSize`(55)로 맞춤(안 그러면 넘칠 위험).
+- **SettingsDialog 추가**: BGM/SFX 각각 라벨 + On/Off 토글 버튼 + 볼륨 슬라이더,
+  하단에 CLOSE 버튼만(참고 이미지에 있던 "게임 설명서"/"크레딧" 버튼은 요청에
+  없어서 제외). `UiFactory.CreateSlider`를 새로 추가(Unity 기본 Slider 프리팹과
+  동일한 Background/FillArea+Fill/HandleSlideArea+Handle 구조를 코드로 구성).
+- **오디오 설정 저장**: `AudioSettingsStore`(PlayerPrefs)로 BGM/SFX On·Off와
+  볼륨을 저장. `AudioManager.ApplyBgmVolume()`을 슬라이더/토글 변경 시마다
+  호출해 재생 중인 BGM에도 즉시 반영. `AudioLibrary`의 볼륨 필드(디자인
+  기준 믹스 레벨)와 곱해서 최종 볼륨을 낸다.
+- **실측 조정**: 선택 테두리 여백 18px → 5px. 슬라이더 Handle 이미지를
+  `UiSpriteLibrary`에 전용 슬롯(`SliderHandleSprite`)으로 분리(버튼 스프라이트
+  재사용 안 함, 나중에 별도 이미지로 추가 예정).
+  **Handle Top/Bottom 인셋의 진짜 원인**: `Slider.UpdateVisuals()`가 세로
+  앵커를 항상 (0,1) 풀스트레치로 강제 덮어쓴다(가로만 값에 따라 점으로 바꿈) —
+  그래서 세로를 점(point)으로 미리 고정해도 Slider가 즉시 되돌려버린다. 세로가
+  스트레치 상태에서는 `sizeDelta.y`가 "부모보다 얼마나 더/덜 튀어나오는가"가
+  되므로, `UiFactory.CreateSlider`의 `handleVerticalOverhang`(현재 5px)를
+  2배 해서 sizeDelta.y로 넣는 방식으로 Top/Bottom을 원하는 값에 정확히 맞춘다.
+
+## 2026-08-14 버튼 선택음(SFX) 칸 추가
+
+- `AudioLibrary`에 `ButtonClickSfx` 슬롯 추가(매치음과 별도). `UiFactory.CreateButton`
+  으로 만든 모든 버튼(타일 제외 — TileButton은 CreateButton을 안 씀)에 자동으로
+  물려서, 각 화면에서 따로 챙기지 않아도 클릭할 때마다 재생된다. 클립을 아직
+  안 넣었으면 매치음과 마찬가지로 합성 대체음(더 짧고 딱딱한 클릭 느낌)으로
+  자동 대체. 매치음 합성 코드를 `GenerateTone(...)` 공용 함수로 뽑아서 버튼
+  클릭음과 파라미터만 다르게 재사용.
+
 ## 2026-08-14 오디오 인스펙터 노출 (BGM/SFX 나중에 직접 추가 예정)
 
 - **UI 전체가 코드로만 지어져서 클립을 끌어다 놓을 씬 오브젝트가 없다.** 그래서

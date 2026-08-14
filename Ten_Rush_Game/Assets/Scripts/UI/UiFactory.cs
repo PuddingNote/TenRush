@@ -1,3 +1,4 @@
+using TenRush.Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -58,7 +59,7 @@ namespace TenRush.UI
             return go.GetComponent<EventSystem>();
         }
 
-        public static RectTransform CreatePanel(Transform parent, string name, Color color)
+        public static RectTransform CreatePanel(Transform parent, string name, Color color, Sprite sprite = null)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Image));
             var rect = (RectTransform)go.transform;
@@ -67,6 +68,14 @@ namespace TenRush.UI
             var image = go.GetComponent<Image>();
             image.color = color;
             image.raycastTarget = color.a > 0f; // 완전 투명한 레이아웃용 패널은 클릭을 가로채지 않게 한다.
+
+            if (sprite != null)
+            {
+                // 전부 흰색 원본이라 색은 위 image.color가 그대로 결정한다.
+                // Sliced로 그려서 크기가 달라져도(버튼마다 폭이 다름 등) 모서리가 안 뭉개진다.
+                image.sprite = sprite;
+                image.type = Image.Type.Sliced;
+            }
 
             return rect;
         }
@@ -104,7 +113,7 @@ namespace TenRush.UI
             Color labelColor,
             float fontSize)
         {
-            var buttonRect = CreatePanel(parent, name, background);
+            var buttonRect = CreatePanel(parent, name, background, UiSprites.Button);
             buttonRect.sizeDelta = new Vector2(width, height);
 
             var button = buttonRect.gameObject.AddComponent<Button>();
@@ -117,7 +126,61 @@ namespace TenRush.UI
             var text = CreateText(buttonRect, "Label", label, fontSize, labelColor);
             Stretch((RectTransform)text.transform);
 
+            // 이 팩토리로 만든 버튼은(타일 제외 — TileButton은 CreateButton을 안 씀)
+            // 전부 클릭할 때 자동으로 버튼 선택음이 나게 한다. 각 화면에서 따로
+            // 챙기지 않아도 되게 하려는 것.
+            button.onClick.AddListener(AudioManager.PlayButtonClick);
+
             return button;
+        }
+
+        /// <summary>
+        /// 0~1 범위의 가로 슬라이더. Unity 기본 Slider 프리팹과 동일한 구조
+        /// (Background/FillArea+Fill/HandleSlideArea+Handle)를 코드로 그대로 짓는다.
+        /// </summary>
+        public static Slider CreateSlider(Transform parent, string name, float width, float height, float value)
+        {
+            const float handleSize = 36f;
+            const float trackHeight = 14f;
+            const float handleVerticalOverhang = 5f; // 아래 Handle 주석 참고
+
+            var rootRect = CreatePanel(parent, name, Color.clear);
+            SetSize(rootRect, width, height);
+            var slider = rootRect.gameObject.AddComponent<Slider>();
+            slider.direction = Slider.Direction.LeftToRight;
+            slider.minValue = 0f;
+            slider.maxValue = 1f;
+
+            var bgRect = CreatePanel(rootRect, "Background", new Color(1f, 1f, 1f, 0.12f));
+            SetAnchor(bgRect, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f));
+            SetSize(bgRect, 0f, trackHeight);
+
+            var fillAreaRect = CreatePanel(rootRect, "FillArea", Color.clear);
+            SetAnchor(fillAreaRect, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f));
+            SetSize(fillAreaRect, -handleSize, trackHeight);
+
+            var fillRect = CreatePanel(fillAreaRect, "Fill", UiTheme.Accent);
+            SetAnchor(fillRect, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f));
+            SetSize(fillRect, 0f, 0f);
+
+            var handleAreaRect = CreatePanel(rootRect, "HandleSlideArea", Color.clear);
+            SetAnchor(handleAreaRect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f));
+            SetSize(handleAreaRect, -handleSize, 0f);
+
+            // 주의: Slider.UpdateVisuals()는 handleRect의 세로 앵커를 항상 (0,1)
+            // 풀스트레치로 강제로 덮어쓴다(가로축만 값에 따라 점으로 바꿈) — 여기서
+            // 미리 세로를 점으로 고정해도 소용없다. 세로 스트레치 상태에서는
+            // sizeDelta.y가 "부모 크기에서 얼마나 더/덜 튀어나오는가"가 되므로,
+            // Top/Bottom이 정확히 -5px가 되도록 sizeDelta.y = 5*2 = 10으로 계산한다.
+            var handleRect = CreatePanel(handleAreaRect, "Handle", UiTheme.Select, UiSprites.SliderHandle);
+            SetSize(handleRect, handleSize, handleVerticalOverhang * 2f);
+
+            slider.fillRect = fillRect;
+            slider.handleRect = handleRect;
+            slider.targetGraphic = handleRect.GetComponent<Image>();
+            slider.value = value;
+
+            return slider;
         }
 
         /// <summary>
