@@ -9,6 +9,7 @@ namespace TenRush.UI.Views
     public sealed class GameOverOverlay : MonoBehaviour
     {
         private TextMeshProUGUI _finalScoreValue;
+        private TextMeshProUGUI _bestScoreValue;
 
         public static GameOverOverlay Create(Transform parent, Action onRetry, Action onMainMenu)
         {
@@ -30,14 +31,19 @@ namespace TenRush.UI.Views
             UiFactory.SetAnchoredPosition(overlay._finalScoreValue.rectTransform, 0f, -210f);
             UiFactory.SetSize(overlay._finalScoreValue.rectTransform, 700f, 70f);
 
+            overlay._bestScoreValue = UiFactory.CreateText(cardRect, "BestScore", "BEST 0", UiTheme.HintFontSize, UiTheme.Select);
+            UiFactory.SetAnchor(overlay._bestScoreValue.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+            UiFactory.SetAnchoredPosition(overlay._bestScoreValue.rectTransform, 0f, -285f);
+            UiFactory.SetSize(overlay._bestScoreValue.rectTransform, 700f, 60f);
+
             // MAIN MENU(왼쪽) / RETRY(오른쪽) 한 줄 배치.
-            var mainMenuButton = UiFactory.CreateButton(cardRect, "MainMenuButton", "MAIN MENU", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.SubInk, Color.black, UiTheme.ButtonFontSize);
+            var mainMenuButton = UiFactory.CreateButton(cardRect, "MainMenuButton", "MAIN MENU", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.SubInk, Color.black, UiTheme.DialogButtonFontSize);
             var mainMenuRect = (RectTransform)mainMenuButton.transform;
             UiFactory.SetAnchor(mainMenuRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             UiFactory.SetAnchoredPosition(mainMenuRect, -UiTheme.DialogButtonRowOffsetX, -160f);
             mainMenuButton.onClick.AddListener(() => onMainMenu?.Invoke());
 
-            var retryButton = UiFactory.CreateButton(cardRect, "RetryButton", "RETRY", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Accent, Color.black, UiTheme.ButtonFontSize);
+            var retryButton = UiFactory.CreateButton(cardRect, "RetryButton", "RETRY", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Accent, Color.black, UiTheme.DialogButtonFontSize);
             var retryRect = (RectTransform)retryButton.transform;
             UiFactory.SetAnchor(retryRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             UiFactory.SetAnchoredPosition(retryRect, UiTheme.DialogButtonRowOffsetX, -160f);
@@ -47,9 +53,10 @@ namespace TenRush.UI.Views
             return overlay;
         }
 
-        public void Show(int finalScore)
+        public void Show(int finalScore, int bestScore)
         {
             _finalScoreValue.text = $"SCORE {finalScore}";
+            _bestScoreValue.text = $"BEST {bestScore}";
             gameObject.SetActive(true);
         }
 

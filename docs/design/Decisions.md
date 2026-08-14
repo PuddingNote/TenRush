@@ -97,3 +97,31 @@
     `TwoCellsNotSummingToTen_ClearsSelectionEntirely`까지 함께 수정).
   - 다음에 기획서를 다시 참고할 일이 있으면 **이 항목은 기획서 원문이 아니라 여기
     적힌 대로(체이닝 없음)가 맞다.**
+
+## 2026-08-14 최고 점수 저장 + 사운드 (코어 루프 완성도)
+
+- **최고 점수**: `TenRush.Managers.HighScoreStore`가 `PlayerPrefs`로 로컬에만 저장.
+  자체 서버 없음 원칙 그대로 유지(개인정보처리방침 가이드 5장과 일치 — 서버가
+  없으면 방침이 짧아짐). 게임오버 오버레이에 SCORE 밑에 BEST도 같이 표시.
+- **사운드는 오디오 에셋 없이 코드로 합성.** `TenRush.Managers.AudioManager`가
+  `AudioClip.Create`로 짧은 "딩" 톤(사인파 + 배음, 지수 감쇠 엔벨로프)을 직접
+  만들어 쓰고, 콤보 단계에 따라 `AudioSource.pitch`만 올려서 "콤보 단계별
+  피치업"(기획서 8장)을 구현했다. **실제 SFX 에셋을 나중에 붙이고 싶으면
+  `AudioManager.GenerateMatchClip()`만 다른 에셋 로드로 바꾸면 되고, 호출부
+  (`BoardView`의 `AudioManager.PlayMatch(comboCount)`)는 그대로 둬도 된다.**
+  씬에 카메라/AudioListener가 없어도 소리가 나도록 `AudioManager`가 필요하면
+  리스너를 직접 만들어 둔다(어떤 씬에 붙여도 동작하게 하려는 `AppRoot`의
+  설계 원칙과 동일).
+
+## 2026-08-14 오디오 인스펙터 노출 (BGM/SFX 나중에 직접 추가 예정)
+
+- **UI 전체가 코드로만 지어져서 클립을 끌어다 놓을 씬 오브젝트가 없다.** 그래서
+  `AudioLibrary`(ScriptableObject, `TenRush.Managers`)를 만들어 인스펙터에서
+  직접 클립을 넣을 수 있게 함. 사용법: 프로젝트 창에서 우클릭 →
+  `Create → TenRush → Audio Library`, 반드시 `Assets/Resources/Audio/AudioLibrary.asset`
+  경로에 저장(`AudioManager`가 `Resources.Load`로 이 경로를 찾음).
+- `AudioManager`가 이 에셋을 `Resources.Load`로 읽어 BGM(루프 재생, `AppRoot`
+  부팅 시 1회 시작)과 매치 SFX(콤보에 따라 피치업)를 재생한다. **에셋이 아직
+  없거나 클립이 비어 있어도 게임은 정상 동작** — BGM은 조용히 스킵, 매치 SFX는
+  이전에 만든 합성 대체음(`GenerateFallbackMatchClip`)으로 자동 대체된다.
+  나중에 실제 클립을 넣으면 코드 수정 없이 그 즉시 반영됨.

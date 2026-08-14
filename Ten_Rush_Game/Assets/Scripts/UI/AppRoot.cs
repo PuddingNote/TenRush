@@ -1,3 +1,4 @@
+using TenRush.Managers;
 using TenRush.UI.Views;
 using UnityEngine;
 
@@ -21,6 +22,8 @@ namespace TenRush.UI
             // 그 전에 자식 UI가 contentRoot.rect 크기를 읽으면(타이머 바 등) 값이
             // 아직 기본값일 수 있어서, 여기서 한 번 강제로 즉시 계산시켜 둔다.
             Canvas.ForceUpdateCanvases();
+
+            AudioManager.PlayBgmIfConfigured();
 
             ShowTitle(contentRoot);
         }

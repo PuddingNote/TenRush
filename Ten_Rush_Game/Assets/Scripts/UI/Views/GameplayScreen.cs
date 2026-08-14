@@ -1,5 +1,6 @@
 using TenRush.Core;
 using TenRush.Core.Model;
+using TenRush.Managers;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -57,7 +58,8 @@ namespace TenRush.UI.Views
                 if (_round.IsGameOver && !_gameOverShown)
                 {
                     _gameOverShown = true;
-                    _gameOverOverlay.Show(_round.Score);
+                    int best = HighScoreStore.SaveIfHigher(_round.Score);
+                    _gameOverOverlay.Show(_round.Score, best);
                 }
             }
 

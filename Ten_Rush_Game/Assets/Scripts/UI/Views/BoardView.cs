@@ -1,6 +1,7 @@
 using System;
 using TenRush.Core;
 using TenRush.Core.Model;
+using TenRush.Managers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -86,7 +87,8 @@ namespace TenRush.UI.Views
 
                 case TapOutcome.Matched:
                     SetHighlight(null);
-                    PlayMatch(result.MatchedA, result.MatchedB);
+                    AudioManager.PlayMatch(result.ComboCount);
+                    AnimateMatch(result.MatchedA, result.MatchedB);
                     break;
             }
         }
@@ -102,7 +104,7 @@ namespace TenRush.UI.Views
                 _tiles[_highlighted.Value.Row, _highlighted.Value.Col].SetSelected(true);
         }
 
-        private void PlayMatch(GridPosition a, GridPosition b)
+        private void AnimateMatch(GridPosition a, GridPosition b)
         {
             int pending = 2;
             void OnOneCleared()

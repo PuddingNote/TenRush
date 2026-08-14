@@ -37,13 +37,13 @@ namespace TenRush.UI.Views
             UiFactory.SetSize(text.rectTransform, 740f, 140f);
 
             // BACK(왼쪽) / 확인(오른쪽) 한 줄 배치.
-            var backButton = UiFactory.CreateButton(cardRect, "BackButton", "BACK", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.SubInk, Color.black, UiTheme.ButtonFontSize);
+            var backButton = UiFactory.CreateButton(cardRect, "BackButton", "BACK", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.SubInk, Color.black, UiTheme.DialogButtonFontSize);
             var backRect = (RectTransform)backButton.transform;
             UiFactory.SetAnchor(backRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             UiFactory.SetAnchoredPosition(backRect, -UiTheme.DialogButtonRowOffsetX, -80f);
             backButton.onClick.AddListener(dialog.Close);
 
-            var confirmButton = UiFactory.CreateButton(cardRect, "ConfirmButton", confirmLabel, UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Danger, Color.black, UiTheme.ButtonFontSize);
+            var confirmButton = UiFactory.CreateButton(cardRect, "ConfirmButton", confirmLabel, UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Danger, Color.black, UiTheme.DialogButtonFontSize);
             var confirmRect = (RectTransform)confirmButton.transform;
             UiFactory.SetAnchor(confirmRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             UiFactory.SetAnchoredPosition(confirmRect, UiTheme.DialogButtonRowOffsetX, -80f);

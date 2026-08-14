@@ -31,6 +31,7 @@ namespace TenRush.UI
         public const float ButtonFontSize = 60f;
         public const float HintFontSize = 50f;
         public const float DialogMessageFontSize = 54f;
+        public const float DialogButtonFontSize = 55f; // ConfirmDialog/GameOverOverlay 버튼 전용 — "MAIN MENU" 등 긴 라벨이 넘치지 않게 ButtonFontSize보다 살짝 작게
 
         public const float HudMargin = 56f; // 화면 모서리로부터 스코어/타이머가 떨어지는 여백
 
