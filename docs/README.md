@@ -6,7 +6,7 @@
   - `ten_match_prototype.html` — 플레이 테스트를 마친 HTML 프로토타입 (기능 검증용, 아트는 무관)
 - `design/Decisions.md` — 기획서 문구와 실제 확정 규칙이 다를 경우 그 차이와 이유를 기록
 - `Monetization.md` — 광고(AdMob) 구성과 판단 근거 (2026-08-15 작성)
-- (예정) `Release.md` — 스토어 출시 준비 시작 시점에 작성
+- `Release.md` — 스토어 출시 준비 체크리스트 (2026-08-15 작성, 진행하면서 항목 갱신)
 - `privacy-policy.html` — 개인정보처리방침 (2026-08-15 작성, 한국어+영어). GitHub Pages로
   이 저장소의 `docs/` 폴더를 소스로 지정하면 `https://{계정}.github.io/{저장소}/privacy-policy.html`
   형태로 바로 공개 가능 — 단, 저장소가 Public이어야 함(Private면 Pages도 기본적으로 막힘)
