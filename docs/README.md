@@ -7,4 +7,6 @@
 - `design/Decisions.md` — 기획서 문구와 실제 확정 규칙이 다를 경우 그 차이와 이유를 기록
 - `Monetization.md` — 광고(AdMob) 구성과 판단 근거 (2026-08-15 작성)
 - (예정) `Release.md` — 스토어 출시 준비 시작 시점에 작성
-- (예정) `privacy-policy.html` — 광고 SDK를 넣은 지금부터 필요 (Google Play 등록 전까지 작성)
+- `privacy-policy.html` — 개인정보처리방침 (2026-08-15 작성, 한국어+영어). GitHub Pages로
+  이 저장소의 `docs/` 폴더를 소스로 지정하면 `https://{계정}.github.io/{저장소}/privacy-policy.html`
+  형태로 바로 공개 가능 — 단, 저장소가 Public이어야 함(Private면 Pages도 기본적으로 막힘)
