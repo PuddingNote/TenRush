@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: UiSpriteLibrary
   m_EditorClassIdentifier: TenRush.UI::TenRush.UI.UiSpriteLibrary
   tileSprite: {fileID: -5112746258621203808, guid: 9951e84a137a00f4cb125117db9114ca, type: 3}
-  selectionBorderSprite: {fileID: -751864590083225810, guid: 5c779642554f37247977c6c2ed2e8f71, type: 3}
+  selectionBorderSprite: {fileID: -4264225401832858, guid: 364ae4ec9b0016d4e850ad15a68d4b0e, type: 3}
   buttonSprite: {fileID: -1149988141224588209, guid: ce4788fa398702843a73a39bf88d654a, type: 3}
   dialogSprite: {fileID: -1149988141224588209, guid: ce4788fa398702843a73a39bf88d654a, type: 3}
   backgroundSprite: {fileID: -5112746258621203808, guid: 9951e84a137a00f4cb125117db9114ca, type: 3}
+  sliderHandleSprite: {fileID: -5112746258621203808, guid: 9951e84a137a00f4cb125117db9114ca, type: 3}

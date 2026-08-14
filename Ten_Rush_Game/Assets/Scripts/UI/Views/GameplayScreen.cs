@@ -19,6 +19,10 @@ namespace TenRush.UI.Views
         private GameOverOverlay _gameOverOverlay;
         private bool _gameOverShown;
 
+        /// <summary>타임업 연장 오퍼를 이미 띄웠는지(봤든 사양했든) — 판당 1회만.</summary>
+        private bool _timeExtensionOffered;
+        private bool _offerDialogOpen;
+
         private System.Action _onExitToTitle;
         private bool _confirmDialogOpen;
 
@@ -56,14 +60,11 @@ namespace TenRush.UI.Views
                 _hud.SetTime(_round.TimeRemainingSeconds);
 
                 if (_round.IsGameOver && !_gameOverShown)
-                {
-                    _gameOverShown = true;
-                    int best = HighScoreStore.SaveIfHigher(_round.Score);
-                    _gameOverOverlay.Show(_round.Score, best);
-                }
+                    HandleRoundEnded();
             }
 
-            if (!_gameOverShown && !_confirmDialogOpen && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            if (!_gameOverShown && !_confirmDialogOpen && !_offerDialogOpen
+                && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 _confirmDialogOpen = true;
                 ConfirmDialog.Create(
@@ -73,6 +74,41 @@ namespace TenRush.UI.Views
                     () => _onExitToTitle?.Invoke(),
                     onClosed: () => _confirmDialogOpen = false);
             }
+        }
+
+        /// <summary>타이머가 0에 닿은 순간. 아직 이번 판에서 연장 오퍼를 안 썼고 광고도 준비돼 있으면 오퍼부터 보여준다.</summary>
+        private void HandleRoundEnded()
+        {
+            if (!_timeExtensionOffered && AdManager.IsRewardedReady)
+            {
+                _timeExtensionOffered = true;
+                _offerDialogOpen = true;
+                TimeUpOfferDialog.Create(transform, extended =>
+                {
+                    _offerDialogOpen = false;
+                    if (extended)
+                    {
+                        _round.ExtendTime(15f);
+                        _hud.SetTime(_round.TimeRemainingSeconds);
+                    }
+                    else
+                    {
+                        ShowResultsScreen();
+                    }
+                });
+            }
+            else
+            {
+                ShowResultsScreen();
+            }
+        }
+
+        private void ShowResultsScreen()
+        {
+            _gameOverShown = true;
+            AdFrequencyStore.RecordRoundPlayed();
+            int best = HighScoreStore.SaveIfHigher(_round.Score);
+            _gameOverOverlay.Show(_round.Score, best);
         }
 
         private void OnTapProcessed(TapResult result)
@@ -85,6 +121,7 @@ namespace TenRush.UI.Views
         {
             _round.Reset();
             _gameOverShown = false;
+            _timeExtensionOffered = false;
             _gameOverOverlay.Hide();
             _board.RefreshAll();
             _hud.SetScore(0);

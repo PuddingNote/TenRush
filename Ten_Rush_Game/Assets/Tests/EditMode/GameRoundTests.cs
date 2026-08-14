@@ -191,5 +191,46 @@ namespace TenRush.Tests
 
             Assert.AreEqual(TapOutcome.Ignored, result.Outcome);
         }
+
+        [Test]
+        public void ExtendTime_AfterGameOver_ResumesRound()
+        {
+            var round = NewFixedRound();
+            round.Tick(GridConstants.RoundTimeSeconds); // 0초로 게임오버
+
+            round.ExtendTime(15f);
+
+            Assert.IsFalse(round.IsGameOver);
+            Assert.AreEqual(15f, round.TimeRemainingSeconds);
+
+            // 다시 정상적으로 탭을 받아준다.
+            var result = round.Tap(0, 0, nowMs: 0);
+            Assert.AreEqual(TapOutcome.Selected, result.Outcome);
+        }
+
+        [Test]
+        public void ExtendTime_ThenTimingOutAgain_EndsGameOnceMore()
+        {
+            var round = NewFixedRound();
+            round.Tick(GridConstants.RoundTimeSeconds);
+            round.ExtendTime(15f);
+
+            round.Tick(15f);
+
+            Assert.IsTrue(round.IsGameOver);
+            Assert.AreEqual(0f, round.TimeRemainingSeconds);
+        }
+
+        [Test]
+        public void ExtendTime_WhileStillPlaying_JustAddsTime()
+        {
+            var round = NewFixedRound();
+            round.Tick(1f); // 59초 남음, 아직 진행 중
+
+            round.ExtendTime(15f);
+
+            Assert.IsFalse(round.IsGameOver);
+            Assert.AreEqual(GridConstants.RoundTimeSeconds - 1f + 15f, round.TimeRemainingSeconds, 0.0001f);
+        }
     }
 }

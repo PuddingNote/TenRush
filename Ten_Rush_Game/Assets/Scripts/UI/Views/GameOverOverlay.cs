@@ -1,4 +1,5 @@
 using System;
+using TenRush.Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,13 +42,15 @@ namespace TenRush.UI.Views
             var mainMenuRect = (RectTransform)mainMenuButton.transform;
             UiFactory.SetAnchor(mainMenuRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             UiFactory.SetAnchoredPosition(mainMenuRect, -UiTheme.DialogButtonRowOffsetX, -160f);
-            mainMenuButton.onClick.AddListener(() => onMainMenu?.Invoke());
+            // 결과 화면을 "벗어나는" 시점에만 전면 광고를 고려한다(재사용 시스템
+            // 모음 2장 원칙) — 빈도 정책은 AdManager/AdFrequencyStore가 알아서 판단.
+            mainMenuButton.onClick.AddListener(() => AdManager.TryShowInterstitial(() => onMainMenu?.Invoke()));
 
             var retryButton = UiFactory.CreateButton(cardRect, "RetryButton", "RETRY", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Accent, Color.black, UiTheme.DialogButtonFontSize);
             var retryRect = (RectTransform)retryButton.transform;
             UiFactory.SetAnchor(retryRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             UiFactory.SetAnchoredPosition(retryRect, UiTheme.DialogButtonRowOffsetX, -160f);
-            retryButton.onClick.AddListener(() => onRetry?.Invoke());
+            retryButton.onClick.AddListener(() => AdManager.TryShowInterstitial(() => onRetry?.Invoke()));
 
             overlay.gameObject.SetActive(false);
             return overlay;

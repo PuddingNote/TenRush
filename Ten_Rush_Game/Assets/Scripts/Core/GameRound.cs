@@ -146,6 +146,19 @@ namespace TenRush.Core
             }
         }
 
+        /// <summary>
+        /// 타임업 후 리워드 광고 시청 보상으로 시간을 더한다(기획서 7장 "+15초 연장").
+        /// 게임이 이미 끝난 상태였다면 다시 진행 상태로 되돌린다. 몇 초를 넣을지,
+        /// 판당 몇 번 쓸 수 있는지는 순전히 UI/광고 쪽 정책이라 Core는 모른다 —
+        /// 그냥 시간을 더하고 필요하면 게임오버를 풀어줄 뿐이다.
+        /// </summary>
+        public void ExtendTime(float seconds)
+        {
+            TimeRemainingSeconds += seconds;
+            if (TimeRemainingSeconds > 0f)
+                IsGameOver = false;
+        }
+
         private void EnsurePlayable()
         {
             int guard = 0;

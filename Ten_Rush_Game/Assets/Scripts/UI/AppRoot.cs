@@ -14,6 +14,8 @@ namespace TenRush.UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
+            AdManager.Initialize(); // 리워드/전면 광고를 최대한 일찍 로드해 둔다(막상 필요할 때 안 기다리게).
+
             UiFactory.CreateEventSystem();
             var canvas = UiFactory.CreateRootCanvas("RootCanvas", out _);
             var contentRoot = UiFactory.CreateLetterboxedContentRoot(canvas.transform);
