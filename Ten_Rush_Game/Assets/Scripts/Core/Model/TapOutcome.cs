@@ -15,7 +15,7 @@ namespace TenRush.Core.Model
         /// <summary>두 타일의 합이 10이라 매치 성공. 실제 값 교체는 <see cref="GameRound.ResolvePendingMatch"/>에서 일어난다.</summary>
         Matched,
 
-        /// <summary>두 타일의 합이 10이 아니라 실패. 방금 탭한 타일이 새 선택으로 이어진다.</summary>
+        /// <summary>두 타일의 합이 10이 아니라 실패. 선택이 전부 해제된다(체이닝 없음 — 2026-08-14 변경).</summary>
         Mismatched
     }
 }

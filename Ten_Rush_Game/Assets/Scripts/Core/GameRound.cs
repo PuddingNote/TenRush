@@ -95,8 +95,11 @@ namespace TenRush.Core
                 return TapResult.CreateMatched(previous, pos, gained, _comboCount);
             }
 
-            // 오답: 선택 해제하고, 방금 탭한 타일이 바로 다음 선택으로 이어진다(재탭 불필요).
-            _selected = pos;
+            // 오답: 선택을 완전히 해제한다. (최초 프로토타입은 방금 탭한 타일이 바로
+            // 다음 선택으로 이어지는 체이닝이었지만, 실제 플레이해보니 의도치 않게
+            // 선택된 채로 남아 다음 시도를 방해한다는 피드백에 따라 2026-08-14 변경 —
+            // docs/design/Decisions.md 참고.)
+            _selected = null;
             return TapResult.CreateMismatched(previous, pos);
         }
 

@@ -17,7 +17,9 @@ namespace TenRush.Core.Model
         public readonly int ComboCount;
 
         public readonly GridPosition MismatchPrevious;
-        public readonly GridPosition MismatchNewSelection;
+
+        /// <summary>오답의 두 번째(방금 탭한) 타일. 더 이상 선택 상태로 남지 않는다 — 흔들림 연출용 위치일 뿐.</summary>
+        public readonly GridPosition MismatchTapped;
 
         private TapResult(
             TapOutcome outcome,
@@ -28,7 +30,7 @@ namespace TenRush.Core.Model
             int scoreGained,
             int comboCount,
             GridPosition mismatchPrevious,
-            GridPosition mismatchNewSelection)
+            GridPosition mismatchTapped)
         {
             Outcome = outcome;
             Selected = selected;
@@ -38,7 +40,7 @@ namespace TenRush.Core.Model
             ScoreGained = scoreGained;
             ComboCount = comboCount;
             MismatchPrevious = mismatchPrevious;
-            MismatchNewSelection = mismatchNewSelection;
+            MismatchTapped = mismatchTapped;
         }
 
         internal static TapResult CreateIgnored() =>
@@ -53,7 +55,7 @@ namespace TenRush.Core.Model
         internal static TapResult CreateMatched(GridPosition a, GridPosition b, int scoreGained, int comboCount) =>
             new TapResult(TapOutcome.Matched, null, null, a, b, scoreGained, comboCount, default, default);
 
-        internal static TapResult CreateMismatched(GridPosition previous, GridPosition newSelection) =>
-            new TapResult(TapOutcome.Mismatched, newSelection, null, default, default, 0, 0, previous, newSelection);
+        internal static TapResult CreateMismatched(GridPosition previous, GridPosition tapped) =>
+            new TapResult(TapOutcome.Mismatched, null, null, default, default, 0, 0, previous, tapped);
     }
 }

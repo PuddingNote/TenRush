@@ -64,18 +64,19 @@ namespace TenRush.Tests
         }
 
         [Test]
-        public void TwoCellsNotSummingToTen_ReturnsMismatchAndReselectsSecondTile()
+        public void TwoCellsNotSummingToTen_ClearsSelectionEntirely()
         {
             var round = NewFixedRound();
             round.Tap(0, 0, nowMs: 0); // value 1
             var result = round.Tap(0, 1, nowMs: 10); // value 2 -> sum 3
 
             Assert.AreEqual(TapOutcome.Mismatched, result.Outcome);
+            Assert.IsNull(result.Selected); // 아무 것도 선택된 채로 남지 않는다(체이닝 없음)
             Assert.AreEqual(0, round.Score);
 
-            // 오답 타일이 바로 다음 선택으로 이어지므로, 그 타일과 합 10인 칸을 탭하면 곧장 매치된다.
-            var followUp = round.Tap(1, 1, nowMs: 20); // value 8, 2+8=10
-            Assert.AreEqual(TapOutcome.Matched, followUp.Outcome);
+            // 선택이 완전히 해제됐으므로, 다음 탭은 매치 시도가 아니라 새 선택이어야 한다.
+            var followUp = round.Tap(1, 1, nowMs: 20); // value 8
+            Assert.AreEqual(TapOutcome.Selected, followUp.Outcome);
         }
 
         [Test]
