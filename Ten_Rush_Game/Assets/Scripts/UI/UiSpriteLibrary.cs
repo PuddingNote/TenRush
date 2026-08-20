@@ -19,8 +19,14 @@ namespace TenRush.UI
     [CreateAssetMenu(fileName = "UiSpriteLibrary", menuName = "TenRush/UI Sprite Library")]
     public sealed class UiSpriteLibrary : ScriptableObject
     {
-        [Header("숫자 타일 (white_square_128)")]
+        [Header("숫자 타일 (white_square_rounded_128)")]
         [SerializeField] private Sprite tileSprite;
+
+        [Header("타일 그림자 (tile_drop_shadow_128) — 타일 뒤에 깔림")]
+        [SerializeField] private Sprite tileShadowSprite;
+
+        [Header("타일 셰이딩 오버레이 (tile_shading_overlay_128) — 타일 위에 그대로 덮음")]
+        [SerializeField] private Sprite tileShadingOverlaySprite;
 
         [Header("숫자 선택 테두리 (line_box_white_square_128)")]
         [SerializeField] private Sprite selectionBorderSprite;
@@ -38,6 +44,8 @@ namespace TenRush.UI
         [SerializeField] private Sprite sliderHandleSprite;
 
         public Sprite TileSprite => tileSprite;
+        public Sprite TileShadowSprite => tileShadowSprite;
+        public Sprite TileShadingOverlaySprite => tileShadingOverlaySprite;
         public Sprite SelectionBorderSprite => selectionBorderSprite;
         public Sprite ButtonSprite => buttonSprite;
         public Sprite DialogSprite => dialogSprite;

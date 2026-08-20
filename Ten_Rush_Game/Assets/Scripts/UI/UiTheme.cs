@@ -26,6 +26,12 @@ namespace TenRush.UI
         // 타일 위에 덧씌운다(2026-08-14 변경 — 선택 테두리 이미지 도입).
         public const float SelectionBorderPadding = 5f;
 
+        // 타일 그림자(2026-08-15 추가). 원본 그림자 스프라이트가 128px 타일 기준
+        // 160px로 만들어져 있어(사방 16px, 12.5%) 그 비율을 그대로 유지한다 —
+        // TileSize를 나중에 바꿔도 그림자 비율이 안 깨지게.
+        public const float TileShadowScale = 160f / 128f;
+        public const float TileShadowOffsetY = -6f; // 살짝 아래로 내려서 "떠 있는" 느낌
+
         public const float HudValueFontSize = 72f;
         public const float HudLabelFontSize = 32f;
         public const float TileFontSize = 52f;

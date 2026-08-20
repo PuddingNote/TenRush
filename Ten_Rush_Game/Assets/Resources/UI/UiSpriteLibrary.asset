@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea9215d68b4cea84689387d3996e3614, type: 3}
   m_Name: UiSpriteLibrary
   m_EditorClassIdentifier: TenRush.UI::TenRush.UI.UiSpriteLibrary
-  tileSprite: {fileID: -5112746258621203808, guid: 9951e84a137a00f4cb125117db9114ca, type: 3}
+  tileSprite: {fileID: -1149988141224588209, guid: ce4788fa398702843a73a39bf88d654a, type: 3}
+  tileShadowSprite: {fileID: 2856015245373472945, guid: d47a9a1232e5e754d867c5e00617f20d, type: 3}
+  tileShadingOverlaySprite: {fileID: -6137092632188188728, guid: 9d8f4cab76741ce4a971f433c933e0d6, type: 3}
   selectionBorderSprite: {fileID: -4264225401832858, guid: 364ae4ec9b0016d4e850ad15a68d4b0e, type: 3}
   buttonSprite: {fileID: -1149988141224588209, guid: ce4788fa398702843a73a39bf88d654a, type: 3}
   dialogSprite: {fileID: -1149988141224588209, guid: ce4788fa398702843a73a39bf88d654a, type: 3}

@@ -12,6 +12,15 @@ namespace TenRush.UI.Views
     ///
     /// 선택 표시는 타일을 확대하는 대신(예전 방식), 타일보다 살짝 큰 테두리
     /// 스프라이트를 위에 덧씌우고 켜고 끄는 방식으로 바꿨다(2026-08-14).
+    ///
+    /// 타일 자체도 평면이 아니라 레이어 3장으로 쌓는다(2026-08-15, 아래→위):
+    ///   1) Shadow — 타일보다 살짝 크고 아래로 내려간 그림자(모든 타일 공통 재사용)
+    ///   2) Base — 실제 탭 판정이 일어나는 면. 흰색 스프라이트를 숫자별 HSL 색으로 틴트
+    ///   3) ShadingOverlay — 색과 무관하게 위는 밝게·아래는 어둡게 보이게 하는 오버레이
+    ///      (틴트 안 하고 그대로 덮음 — 그 자체가 이미 반투명 그라디언트라서 색이
+    ///      뭐든 자연스럽게 입체감을 준다)
+    /// 그림자/오버레이 스프라이트가 아직 없으면(UiSpriteLibrary 슬롯이 비어 있으면)
+    /// 그 레이어 자체를 안 만든다 — 불투명한 흰 사각형으로 덮여버리는 걸 방지.
     /// </summary>
     public sealed class TileButton : MonoBehaviour, IPointerClickHandler
     {
@@ -25,12 +34,34 @@ namespace TenRush.UI.Views
 
         public static TileButton Create(Transform parent, int row, int col, Action<int, int> onTapped)
         {
-            var rect = UiFactory.CreatePanel(parent, $"Tile_{row}_{col}", UiTheme.BoardBackground, UiSprites.Tile);
+            var rect = UiFactory.CreatePanel(parent, $"Tile_{row}_{col}", Color.clear);
             var tile = rect.gameObject.AddComponent<TileButton>();
             tile.Row = row;
             tile.Col = col;
             tile._onTapped = onTapped;
-            tile._background = rect.GetComponent<Image>();
+
+            if (UiSprites.TileShadow != null)
+            {
+                var shadowRect = UiFactory.CreatePanel(rect, "Shadow", Color.white, UiSprites.TileShadow);
+                UiFactory.SetAnchor(shadowRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+                float shadowSize = UiTheme.TileSize * UiTheme.TileShadowScale;
+                UiFactory.SetSize(shadowRect, shadowSize, shadowSize);
+                UiFactory.SetAnchoredPosition(shadowRect, 0f, UiTheme.TileShadowOffsetY);
+                shadowRect.GetComponent<Image>().raycastTarget = false;
+            }
+
+            // 실제 탭 판정이 일어나는 면 — 예전엔 이 타일 GameObject 루트 자신이었지만,
+            // 이제 그림자가 뒤에 깔려야 해서 별도 자식으로 뺐다.
+            var baseRect = UiFactory.CreatePanel(rect, "Base", UiTheme.BoardBackground, UiSprites.Tile);
+            UiFactory.Stretch(baseRect);
+            tile._background = baseRect.GetComponent<Image>();
+
+            if (UiSprites.TileShadingOverlay != null)
+            {
+                var shadingRect = UiFactory.CreatePanel(rect, "ShadingOverlay", Color.white, UiSprites.TileShadingOverlay);
+                UiFactory.Stretch(shadingRect);
+                shadingRect.GetComponent<Image>().raycastTarget = false;
+            }
 
             // 타일보다 SelectionBorderPadding만큼 사방으로 더 큰 테두리 — 다른 타일과
             // 안 겹치면서도 눈에 띄게 살짝 밖으로 삐져나온다.

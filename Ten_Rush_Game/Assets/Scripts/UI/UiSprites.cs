@@ -29,6 +29,8 @@ namespace TenRush.UI
         }
 
         public static Sprite Tile => Library != null ? Library.TileSprite : null;
+        public static Sprite TileShadow => Library != null ? Library.TileShadowSprite : null;
+        public static Sprite TileShadingOverlay => Library != null ? Library.TileShadingOverlaySprite : null;
         public static Sprite SelectionBorder => Library != null ? Library.SelectionBorderSprite : null;
         public static Sprite Button => Library != null ? Library.ButtonSprite : null;
         public static Sprite Dialog => Library != null ? Library.DialogSprite : null;
