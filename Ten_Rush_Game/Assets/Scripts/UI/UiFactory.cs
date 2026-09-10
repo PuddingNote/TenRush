@@ -155,9 +155,14 @@ namespace TenRush.UI
             SetAnchor(bgRect, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f));
             SetSize(bgRect, 0f, trackHeight);
 
+            // FillArea/HandleArea를 핸들 반지름만큼 안쪽으로 밀어넣지 않고 트랙과
+            // 똑같이 좌우 끝까지 채운다. 그래야 값이 0일 때 왼쪽에 "칠해지지 않는
+            // 빈 공간"이 안 생기고, 채움(초록)이 트랙 맨 왼쪽부터 시작한다.
+            // 대신 핸들이 양 끝에서 트랙 밖으로 반쯤 걸치는데(일반적인 슬라이더 모양),
+            // 카드 안에 여백이 충분해서 잘리지 않는다.
             var fillAreaRect = CreatePanel(rootRect, "FillArea", Color.clear);
             SetAnchor(fillAreaRect, new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f));
-            SetSize(fillAreaRect, -handleSize, trackHeight);
+            SetSize(fillAreaRect, 0f, trackHeight);
 
             var fillRect = CreatePanel(fillAreaRect, "Fill", UiTheme.Accent);
             SetAnchor(fillRect, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f));
@@ -165,7 +170,7 @@ namespace TenRush.UI
 
             var handleAreaRect = CreatePanel(rootRect, "HandleSlideArea", Color.clear);
             SetAnchor(handleAreaRect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f));
-            SetSize(handleAreaRect, -handleSize, 0f);
+            SetSize(handleAreaRect, 0f, 0f);
 
             // 주의: Slider.UpdateVisuals()는 handleRect의 세로 앵커를 항상 (0,1)
             // 풀스트레치로 강제로 덮어쓴다(가로축만 값에 따라 점으로 바꿈) — 여기서
