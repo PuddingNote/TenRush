@@ -74,13 +74,24 @@ Unity 에디터에서 Play 할 때는 SDK가 실제 기기 광고 대신 자체 
   `ConsentInformation.PrivacyOptionsRequirementStatus == Required`일 때만
   "PRIVACY OPTIONS" 버튼이 나타나게 했다(해당 지역 아니면 버튼 자체가 안 생김).
 - **테스트 방법**: `ConsentManager.GatherConsent()`에 `DebugGeography.EEA`
-  디버그 설정을 넣어 뒀는데, `#if UNITY_EDITOR || DEVELOPMENT_BUILD`로
-  감싸서 **에디터/개발 빌드에서만 컴파일되고 실제 Release 빌드(스토어 제출용)
-  에는 이 코드 자체가 통째로 빠진다** — "나중에 지워야 하는 위험한 코드"가
-  아니라 구조적으로 안전하다. 실제로 동의창을 보려면: Build Settings에서
-  "Development Build" 체크 → 실기기에 설치(에디터는 네이티브 동의창 UI가
-  안 뜰 가능성이 높음) → 첫 실행. 그래도 안 뜨면 기기 로그(Logcat)에 찍히는
-  "테스트 기기로 등록하라"는 안내의 해시 ID를 `TestDeviceHashedIds`에 추가.
+  디버그 설정을 넣어 뒀는데, `#if DEVELOPMENT_BUILD`로 감싸서 **"Development
+  Build" 체크 후 만든 실기기 빌드에서만 컴파일되고, 실제 Release 빌드
+  (스토어 제출용)에는 이 코드 자체가 통째로 빠진다** — "나중에 지워야 하는
+  위험한 코드"가 아니라 구조적으로 안전하다. 동의창을 보려면: Build
+  Settings에서 "Development Build" 체크 → 실기기에 설치 → 첫 실행. 그래도
+  안 뜨면 기기 로그(Logcat)에 찍히는 "테스트 기기로 등록하라"는 안내의 해시
+  ID를 `TestDeviceHashedIds`에 추가.
+- **⚠️ 유니티 에디터에서 폼을 "보여주면" 게임이 영원히 멈추는 버그(2026-09-11
+  실제로 겪음)**: 에디터의 UMP는 "플레이스홀더"라서, `ConsentForm.
+  LoadAndShowConsentFormIfRequired()`가 실제 화면을 그리는 대신
+  `Time.timeScale = 0`으로 게임만 멈추고 끝(닫을 방법이 없어서 영원히 멈춤 —
+  Console에 `Pause Game`이라는 로그가 찍히는 게 이 증상). **그래서 폼을
+  "보여주는" 호출 자체를 `#if UNITY_EDITOR`로 건너뛰게 했다** — 에디터에서는
+  동의 정보 조회까지만 하고 폼은 절대 안 띄운다. 동의창 실제 모습은 위
+  Development Build 방법으로만 확인 가능. 처음엔 디버그 설정 자체를
+  `#if UNITY_EDITOR || DEVELOPMENT_BUILD`로 걸어서 에디터에서도 EEA를
+  강제했었는데, 그게 이 버그를 유발한 원인이었다 — 지금은 에디터에서는
+  디버그 설정 자체를 아예 안 넣는다.
 - 개인정보처리방침(`docs/privacy-policy.html`)에도 UMP·Privacy Options
   안내 문구 추가함(2026-09-11).
 

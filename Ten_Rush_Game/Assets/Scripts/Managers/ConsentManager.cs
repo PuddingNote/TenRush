@@ -23,12 +23,13 @@ namespace TenRush.Managers
         {
             var request = new ConsentRequestParameters();
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            // 테스트 전용 — 이 블록은 에디터/개발 빌드에서만 컴파일된다. 실제
-            // 스토어에 올리는 Release 빌드에는 이 코드 자체가 통째로 빠지므로,
-            // 지워야 한다는 걸 기억할 필요 없이 안전하다. 한국은 EEA/영국이
-            // 아니라 평소엔 동의창이 절대 안 뜨는데, 이걸로 기기를 EEA인 것처럼
-            // 속여서 동의창이 실제로 어떻게 뜨는지 확인할 수 있다.
+#if DEVELOPMENT_BUILD
+            // 테스트 전용 — 이 블록은 "Development Build" 체크 후 만든 실기기
+            // 빌드에서만 컴파일된다(에디터는 제외 — 아래 참고). 실제 스토어에
+            // 올리는 Release 빌드에는 이 코드 자체가 통째로 빠지므로, 지워야
+            // 한다는 걸 기억할 필요 없이 안전하다. 한국은 EEA/영국이 아니라
+            // 평소엔 동의창이 절대 안 뜨는데, 이걸로 기기를 EEA인 것처럼 속여서
+            // 동의창이 실제로 어떻게 뜨는지 확인할 수 있다.
             request.ConsentDebugSettings = new ConsentDebugSettings
             {
                 DebugGeography = DebugGeography.EEA,
@@ -49,6 +50,14 @@ namespace TenRush.Managers
                     return;
                 }
 
+#if UNITY_EDITOR
+                // 유니티 에디터의 UMP는 "플레이스홀더"라서, 폼을 보여주는 척하며
+                // Time.timeScale을 0으로 고정해 버린다 — 근데 실제로 뜨는 화면이
+                // 없어서 닫을 방법이 없고, 그대로 게임이 영원히 멈춘다(2026-09-11
+                // 실제로 겪은 버그). 그래서 에디터에서는 폼 표시 자체를 건너뛴다 —
+                // 동의창 미리보기는 실기기 Development Build로 확인한다.
+                onReadyToRequestAds?.Invoke();
+#else
                 ConsentForm.LoadAndShowConsentFormIfRequired(formError =>
                 {
                     if (formError != null)
@@ -56,6 +65,7 @@ namespace TenRush.Managers
 
                     onReadyToRequestAds?.Invoke();
                 });
+#endif
             });
         }
 
