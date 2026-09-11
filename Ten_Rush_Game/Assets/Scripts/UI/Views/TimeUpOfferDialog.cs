@@ -45,7 +45,7 @@ namespace TenRush.UI.Views
             UiFactory.SetAnchoredPosition(title.rectTransform, 0f, -90f);
             UiFactory.SetSize(title.rectTransform, 700f, 100f);
 
-            var message = UiFactory.CreateText(cardRect, "Message", "Watch an ad for +15 seconds?", UiTheme.DialogMessageFontSize, UiTheme.SubInk);
+            var message = UiFactory.CreateText(cardRect, "Message", "Watch an ad for\n+15 seconds?", UiTheme.DialogMessageFontSize, UiTheme.SubInk);
             UiFactory.SetAnchor(message.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
             UiFactory.SetAnchoredPosition(message.rectTransform, 0f, -210f);
             UiFactory.SetSize(message.rectTransform, 780f, 150f); // 2줄 줄바꿈까지 여유있게
