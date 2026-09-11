@@ -22,6 +22,7 @@ namespace TenRush.UI.Views
         private bool _resolved;
         private float _remaining;
         private TextMeshProUGUI _countdownText;
+        private int _lastDisplaySeconds = -1;
 
         /// <param name="onResolved">true = 광고를 끝까지 봐서 연장 보상을 받음, false = 사양(버튼/시간초과/광고 실패 전부 포함).</param>
         public static TimeUpOfferDialog Create(Transform parent, Action<bool> onResolved)
@@ -82,7 +83,14 @@ namespace TenRush.UI.Views
 
         private void UpdateCountdownText()
         {
-            _countdownText.text = $"Auto-skip in {Mathf.Max(0, Mathf.CeilToInt(_remaining))}s";
+            // 정수가 실제로 바뀔 때만 문자열을 새로 만든다(매 프레임 string 보간은
+            // GC 쓰레기를 만들어서 모바일에서 끊김의 원인이 된다).
+            int seconds = Mathf.Max(0, Mathf.CeilToInt(_remaining));
+            if (seconds == _lastDisplaySeconds)
+                return;
+
+            _lastDisplaySeconds = seconds;
+            _countdownText.text = $"Auto-skip in {seconds}s";
         }
 
         private void RequestAd()

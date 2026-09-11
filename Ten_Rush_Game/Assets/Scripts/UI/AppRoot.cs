@@ -11,9 +11,22 @@ namespace TenRush.UI
     /// </summary>
     public static class AppRoot
     {
+        // 이 게임 UI에서 실제로 쓰는 문자만 모아 둔 집합 — 전부 영어 텍스트라 이걸로 충분하다.
+        private const string PreloadedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '?!:+-.,";
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
+            // 모바일에서 기본 프레임레이트/VSync 설정이 기기마다 달라서 끊기게 느껴질
+            // 수 있다 — 명시적으로 60fps를 못 박는다.
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0;
+
+            // 폰트가 Dynamic 아틀라스라 새 글자가 처음 등장할 때마다 런타임에 그 글자를
+            // 구워 넣으면서 순간적으로 끊긴다. 부팅 시점에 쓸 글자를 전부 한 번에
+            // 구워 두면 플레이 중에는 그런 히치가 안 생긴다.
+            UiTheme.Font.TryAddCharacters(PreloadedCharacters);
+
             AdManager.Initialize(); // 리워드/전면 광고를 최대한 일찍 로드해 둔다(막상 필요할 때 안 기다리게).
 
             UiFactory.CreateEventSystem();

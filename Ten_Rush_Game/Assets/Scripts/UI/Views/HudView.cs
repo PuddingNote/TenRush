@@ -19,6 +19,20 @@ namespace TenRush.UI.Views
         private CanvasGroup _comboGroup;
         private Coroutine _comboHideRoutine;
 
+        // 남은 초를 문자열로 미리 구워 둔다 — 매 프레임 int.ToString()을 새로 호출하면
+        // GC 쓰레기가 쌓여서(60fps로 60초 = 3600번) 모바일에서 프레임이 끊기는 원인이
+        // 된다. 표시되는 정수가 실제로 바뀔 때만(초당 한 번 정도) 텍스트를 갱신한다.
+        private static readonly string[] SecondsTextCache = BuildSecondsTextCache();
+        private int _lastDisplaySeconds = -1;
+
+        private static string[] BuildSecondsTextCache()
+        {
+            var cache = new string[120];
+            for (int i = 0; i < cache.Length; i++)
+                cache[i] = i.ToString();
+            return cache;
+        }
+
         public static HudView Create(Transform parent)
         {
             var rootRect = UiFactory.CreatePanel(parent, "Hud", Color.clear);
@@ -82,7 +96,11 @@ namespace TenRush.UI.Views
         public void SetTime(float timeRemainingSeconds)
         {
             int displaySeconds = Mathf.CeilToInt(Mathf.Max(0f, timeRemainingSeconds));
-            _timeValue.text = displaySeconds.ToString();
+            if (displaySeconds != _lastDisplaySeconds)
+            {
+                _lastDisplaySeconds = displaySeconds;
+                _timeValue.text = displaySeconds < SecondsTextCache.Length ? SecondsTextCache[displaySeconds] : displaySeconds.ToString();
+            }
 
             float pct = Mathf.Clamp01(timeRemainingSeconds / GridConstants.RoundTimeSeconds);
             float trackWidth = _timerTrack.rect.width;
