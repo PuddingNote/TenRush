@@ -26,6 +26,11 @@ namespace TenRush.UI.Views
         private System.Action _onExitToTitle;
         private bool _confirmDialogOpen;
 
+        /// <summary>시작/재시작 직후 3-2-1 카운트다운이 도는 동안 true — 타이머도, 뒤로가기 확인창도 안 뜬다.</summary>
+        private bool _countdownActive;
+
+        private const int CountdownSeconds = 3;
+
         public static GameplayScreen Create(Transform parent, System.Action onExitToTitle)
         {
             var rootRect = UiFactory.CreatePanel(parent, "GameplayScreen", UiTheme.Background, UiSprites.Background);
@@ -49,11 +54,22 @@ namespace TenRush.UI.Views
 
             screen._gameOverOverlay = GameOverOverlay.Create(rootRect, screen.OnRetryRequested, () => onExitToTitle?.Invoke());
 
+            screen.StartCountdown();
+
             return screen;
+        }
+
+        private void StartCountdown()
+        {
+            _countdownActive = true;
+            CountdownOverlay.Create(transform, CountdownSeconds, () => _countdownActive = false);
         }
 
         private void Update()
         {
+            if (_countdownActive)
+                return;
+
             if (!_round.IsGameOver)
             {
                 _round.Tick(Time.deltaTime);
@@ -126,6 +142,7 @@ namespace TenRush.UI.Views
             _board.RefreshAll();
             _hud.SetScore(0);
             _hud.SetTime(_round.TimeRemainingSeconds);
+            StartCountdown();
         }
     }
 }

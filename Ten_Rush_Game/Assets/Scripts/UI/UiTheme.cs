@@ -18,6 +18,8 @@ namespace TenRush.UI
         public static readonly Color Danger = HexColor("#FF5D7A");
         public static readonly Color Accent = HexColor("#6EE7B7");
         public static readonly Color Select = HexColor("#FDE68A");
+        // 다이얼로그들과 같은 톤 + 같은 반투명도(0.82) — 뒤에 보드가 은은하게 비쳐 보인다.
+        public static readonly Color CountdownBackground = new Color(10f / 255f, 10f / 255f, 26f / 255f, 0.82f);
 
         public const float TileSize = 152f;
         public const float TileSpacing = 12f;
@@ -41,6 +43,7 @@ namespace TenRush.UI
         public const float HintFontSize = 50f;
         public const float DialogMessageFontSize = 54f;
         public const float DialogButtonFontSize = 55f; // ConfirmDialog/GameOverOverlay 버튼 전용 — "MAIN MENU" 등 긴 라벨이 넘치지 않게 ButtonFontSize보다 살짝 작게
+        public const float CountdownFontSize = 260f;
 
         public const float HudMargin = 56f; // 화면 모서리로부터 스코어/타이머가 떨어지는 여백
 
