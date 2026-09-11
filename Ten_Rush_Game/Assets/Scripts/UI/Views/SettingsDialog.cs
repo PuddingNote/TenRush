@@ -56,17 +56,17 @@ namespace TenRush.UI.Views
             // 나중에 동의 선택을 바꿀 수 있어야 한다는 게 Google 정책 요건.
             if (ConsentManager.IsPrivacyOptionsRequired)
             {
-                var privacyButton = UiFactory.CreateButton(cardRect, "PrivacyOptionsButton", "PRIVACY OPTIONS", 680f, 80f, UiTheme.SubInk, Color.black, UiTheme.DialogButtonFontSize);
+                var privacyButton = UiFactory.CreateButton(cardRect, "PrivacyOptionsButton", "PRIVACY OPTIONS", 680f, 110f, UiTheme.SubInk, Color.black, UiTheme.DialogButtonFontSize);
                 var privacyRect = (RectTransform)privacyButton.transform;
                 UiFactory.SetAnchor(privacyRect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
-                UiFactory.SetAnchoredPosition(privacyRect, 0f, 230f);
+                UiFactory.SetAnchoredPosition(privacyRect, 0f, 190f);
                 privacyButton.onClick.AddListener(() => ConsentManager.ShowPrivacyOptionsForm());
             }
 
-            var closeButton = UiFactory.CreateButton(cardRect, "CloseButton", "CLOSE", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Accent, Color.black, UiTheme.DialogButtonFontSize);
+            var closeButton = UiFactory.CreateButton(cardRect, "CloseButton", "CLOSE", 680f, UiTheme.DialogButtonHeight, UiTheme.Accent, Color.black, UiTheme.DialogButtonFontSize);
             var closeRect = (RectTransform)closeButton.transform;
             UiFactory.SetAnchor(closeRect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
-            UiFactory.SetAnchoredPosition(closeRect, 0f, 90f);
+            UiFactory.SetAnchoredPosition(closeRect, 0f, 50f);
             closeButton.onClick.AddListener(dialog.Close);
 
             return dialog;
