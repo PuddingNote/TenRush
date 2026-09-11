@@ -14,6 +14,9 @@ namespace TenRush.Managers
     /// 자체 스텁으로 항상 샘플 광고를 보여주므로, 에디터 안에서는 이 ID로 실제
     /// 광고가 나가거나 계정에 영향이 가지 않는다 — 실제 기기 빌드로 반복 클릭할
     /// 때만 주의(무효 트래픽 위험, AdMob 콘솔에 테스트 기기로 등록해서 방지).
+    ///
+    /// 전 세계 배포로 정하면서(2026-09-11) SDK 초기화/광고 요청 전에 반드시
+    /// <see cref="ConsentManager"/>의 UMP 동의 수집을 먼저 거치도록 바뀌었다.
     /// </summary>
     public static class AdManager
     {
@@ -26,17 +29,31 @@ namespace TenRush.Managers
 
         public static bool IsRewardedReady => _rewardedAd != null && _rewardedAd.CanShowAd();
 
-        /// <summary>AppRoot 부팅 시 한 번 호출. 초기화 직후 다음 리워드/전면 광고를 미리 로드해 둔다.</summary>
+        /// <summary>
+        /// AppRoot 부팅 시 한 번 호출. UMP 동의 수집이 끝난 뒤에만(그리고 동의
+        /// 상 광고 요청이 가능할 때만) 실제로 SDK를 초기화하고 광고를 미리
+        /// 로드해 둔다 — EEA/영국 사용자에게 동의 전 광고를 요청하면 안 되기
+        /// 때문(<see cref="ConsentManager"/> 참고).
+        /// </summary>
         public static void Initialize()
         {
             if (_initialized)
                 return;
             _initialized = true;
 
-            MobileAds.Initialize(_ =>
+            ConsentManager.GatherConsent(() =>
             {
-                LoadRewardedAd();
-                LoadInterstitialAd();
+                if (!ConsentManager.CanRequestAds)
+                {
+                    Debug.Log("[TenRush] Ads not initialized — consent not granted for ad requests.");
+                    return;
+                }
+
+                MobileAds.Initialize(_ =>
+                {
+                    LoadRewardedAd();
+                    LoadInterstitialAd();
+                });
             });
         }
 

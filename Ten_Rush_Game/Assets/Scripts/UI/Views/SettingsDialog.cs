@@ -20,9 +20,12 @@ namespace TenRush.UI.Views
             var dialog = rootRect.gameObject.AddComponent<SettingsDialog>();
             dialog._onClosed = onClosed;
 
+            // Privacy Options 버튼이 필요한 경우(= EEA/영국 사용자에게 UMP 동의
+            // 폼을 보여준 적이 있는 경우)를 대비해 카드를 살짝 더 키워 둔다.
+            // 필요 없는 지역 사용자는 그 버튼 자체가 안 생기고 아래쪽 여백만 남는다.
             var cardRect = UiFactory.CreatePanel(rootRect, "Card", UiTheme.BoardBackground, UiSprites.Dialog);
             UiFactory.SetAnchor(cardRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            UiFactory.SetSize(cardRect, 920f, 760f);
+            UiFactory.SetSize(cardRect, 920f, 860f);
 
             var title = UiFactory.CreateText(cardRect, "Title", "SETTINGS", 64f, UiTheme.Ink);
             UiFactory.SetAnchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
@@ -48,6 +51,17 @@ namespace TenRush.UI.Views
                 AudioSettingsStore.SfxEnabled, AudioSettingsStore.SfxVolume,
                 enabled => AudioSettingsStore.SfxEnabled = enabled,
                 volume => AudioSettingsStore.SfxVolume = volume);
+
+            // EEA/영국처럼 UMP 동의 폼을 보여준 지역의 사용자에게만 보이는 진입점 —
+            // 나중에 동의 선택을 바꿀 수 있어야 한다는 게 Google 정책 요건.
+            if (ConsentManager.IsPrivacyOptionsRequired)
+            {
+                var privacyButton = UiFactory.CreateButton(cardRect, "PrivacyOptionsButton", "PRIVACY OPTIONS", 680f, 80f, UiTheme.SubInk, Color.black, UiTheme.DialogButtonFontSize);
+                var privacyRect = (RectTransform)privacyButton.transform;
+                UiFactory.SetAnchor(privacyRect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f));
+                UiFactory.SetAnchoredPosition(privacyRect, 0f, 230f);
+                privacyButton.onClick.AddListener(() => ConsentManager.ShowPrivacyOptionsForm());
+            }
 
             var closeButton = UiFactory.CreateButton(cardRect, "CloseButton", "CLOSE", UiTheme.DialogButtonWidth, UiTheme.DialogButtonHeight, UiTheme.Accent, Color.black, UiTheme.DialogButtonFontSize);
             var closeRect = (RectTransform)closeButton.transform;

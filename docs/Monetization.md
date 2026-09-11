@@ -56,10 +56,36 @@ Unity 에디터에서 Play 할 때는 SDK가 실제 기기 광고 대신 자체 
 트래픽으로 계정이 제재될 수 있으니, 그럴 땐 AdMob 콘솔에 해당 기기를
 테스트 기기로 등록해 둘 것.
 
+## UMP(EEA/영국 동의) — 2026-09-11 구현 완료
+
+전 세계 배포로 정하면서 미뤄뒀던 UMP를 붙였다. `ConsentManager`
+(`TenRush.Managers`)가 GoogleMobileAds.Ump.Api를 감싼다.
+
+- **순서**: `AdManager.Initialize()`가 예전엔 바로 `MobileAds.Initialize()`를
+  불렀는데, 이제 `ConsentManager.GatherConsent(...)`로 동의 정보를 먼저
+  조회 → 필요하면(EEA/영국) 동의 폼을 보여줌 → 그 다음에야 `CanRequestAds()`가
+  true일 때만 실제 SDK 초기화 + 광고 로드. EEA/영국이 아닌 사용자는 SDK가
+  알아서 폼 없이 바로 통과시킨다.
+- **Fail-open**: 동의 정보 조회 자체가 실패해도(오프라인 등) 콜백은 항상
+  불린다 — 강제 업데이트와 같은 원칙. 그 경우 `CanRequestAds()`가 false면
+  그냥 광고를 안 띄울 뿐, 게임 진행에는 영향 없음.
+- **Privacy Options 진입점**: Google 정책상 동의 폼을 보여준 사용자에게는
+  나중에 선택을 바꿀 수 있는 진입점을 계속 제공해야 함. `SettingsDialog`에
+  `ConsentInformation.PrivacyOptionsRequirementStatus == Required`일 때만
+  "PRIVACY OPTIONS" 버튼이 나타나게 했다(해당 지역 아니면 버튼 자체가 안 생김).
+- **테스트 방법**: `ConsentManager.GatherConsent()`에 `DebugGeography.EEA`
+  디버그 설정을 넣어 뒀는데, `#if UNITY_EDITOR || DEVELOPMENT_BUILD`로
+  감싸서 **에디터/개발 빌드에서만 컴파일되고 실제 Release 빌드(스토어 제출용)
+  에는 이 코드 자체가 통째로 빠진다** — "나중에 지워야 하는 위험한 코드"가
+  아니라 구조적으로 안전하다. 실제로 동의창을 보려면: Build Settings에서
+  "Development Build" 체크 → 실기기에 설치(에디터는 네이티브 동의창 UI가
+  안 뜰 가능성이 높음) → 첫 실행. 그래도 안 뜨면 기기 로그(Logcat)에 찍히는
+  "테스트 기기로 등록하라"는 안내의 해시 ID를 `TestDeviceHashedIds`에 추가.
+- 개인정보처리방침(`docs/privacy-policy.html`)에도 UMP·Privacy Options
+  안내 문구 추가함(2026-09-11).
+
 ## 미룬 것
 
-- **UMP(EU 동의 배너)**: 지금은 국내/테스트 단계라 안 붙임. 배포 국가를
-  정하고 실제 EU 배포를 계획하는 시점에 다시 논의.
 - **배너 광고**: 재사용 시스템 모음 2장 원칙대로 처음부터 제외(그리드+HUD가
   화면을 이미 꽉 채워서 배너 넣으면 오조작 유발).
 
