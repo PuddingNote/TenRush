@@ -25,7 +25,7 @@ namespace TenRush.Managers
 
         public static float BgmVolume
         {
-            get => PlayerPrefs.GetFloat(BgmVolumeKey, 0.5f);
+            get => PlayerPrefs.GetFloat(BgmVolumeKey, 0.25f);
             set
             {
                 PlayerPrefs.SetFloat(BgmVolumeKey, Mathf.Clamp01(value));
@@ -45,7 +45,7 @@ namespace TenRush.Managers
 
         public static float SfxVolume
         {
-            get => PlayerPrefs.GetFloat(SfxVolumeKey, 0.5f);
+            get => PlayerPrefs.GetFloat(SfxVolumeKey, 0.45f);
             set
             {
                 PlayerPrefs.SetFloat(SfxVolumeKey, Mathf.Clamp01(value));
