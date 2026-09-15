@@ -10,8 +10,8 @@ namespace TenRush.Managers
     /// 사용법: 프로젝트 창에서 우클릭 → Create → TenRush → Audio Library, 반드시
     /// <c>Assets/Resources/Audio/AudioLibrary.asset</c> 경로에 저장할 것
     /// (AudioManager가 Resources.Load로 이 경로를 찾는다). 클립을 아직 안 넣었으면
-    /// AudioManager가 알아서 대체음(합성 톤)으로 재생하므로, 지금 당장 에셋이
-    /// 없어도(또는 클립이 비어 있어도) 게임은 정상 동작한다.
+    /// 해당 사운드는 그냥 무음으로 재생되므로, 지금 당장 슬롯이 비어 있어도
+    /// 게임은 정상 동작한다.
     /// </summary>
     [CreateAssetMenu(fileName = "AudioLibrary", menuName = "TenRush/Audio Library")]
     public sealed class AudioLibrary : ScriptableObject
@@ -21,14 +21,20 @@ namespace TenRush.Managers
         [SerializeField, Range(0f, 1f)] private float bgmVolume = 0.6f;
 
         [Header("SFX")]
-        [SerializeField] private AudioClip matchSfx;
-        [SerializeField] private AudioClip buttonClickSfx;
+        [SerializeField] private AudioClip buttonClickSfx; // 버튼 터치음
+        [SerializeField] private AudioClip tileSelectSfx; // 숫자 타일 터치음
+        [SerializeField] private AudioClip matchSuccessSfx; // 합 10 맞을 때
+        [SerializeField] private AudioClip matchFailSfx; // 합 10 아닐 때(미스매치)
+        [SerializeField] private AudioClip roundEndSfx; // 라운드 종료
         [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
 
         public AudioClip BgmClip => bgmClip;
         public float BgmVolume => bgmVolume;
-        public AudioClip MatchSfx => matchSfx;
         public AudioClip ButtonClickSfx => buttonClickSfx;
+        public AudioClip TileSelectSfx => tileSelectSfx;
+        public AudioClip MatchSuccessSfx => matchSuccessSfx;
+        public AudioClip MatchFailSfx => matchFailSfx;
+        public AudioClip RoundEndSfx => roundEndSfx;
         public float SfxVolume => sfxVolume;
     }
 }

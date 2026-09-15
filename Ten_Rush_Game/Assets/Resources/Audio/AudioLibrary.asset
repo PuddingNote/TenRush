@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d9894c24fb8d64eb00b70eb0da96bc, type: 3}
   m_Name: AudioLibrary
   m_EditorClassIdentifier: TenRush.Managers::TenRush.Managers.AudioLibrary
-  bgmClip: {fileID: 0}
+  bgmClip: {fileID: 8300000, guid: ec56770145f32e44db77c963538bec08, type: 3}
   bgmVolume: 0.6
-  matchSfx: {fileID: 0}
+  buttonClickSfx: {fileID: 8300000, guid: f28a2727428786a4da7653291a2c935f, type: 3}
+  tileSelectSfx: {fileID: 8300000, guid: bb5a0651491be9049a2ae6968ed5f46c, type: 3}
+  matchSuccessSfx: {fileID: 8300000, guid: 0e41aa70fe29490489f6566fac70ad46, type: 3}
+  matchFailSfx: {fileID: 8300000, guid: 6e53a6614b6dd37418af82a02709949d, type: 3}
+  roundEndSfx: {fileID: 8300000, guid: 0676ca68529cf8f4bb6e08a490f349ca, type: 3}
   sfxVolume: 1
