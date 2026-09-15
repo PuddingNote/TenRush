@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  HapticManager가 Handheld.Vibrate()로 진동을 재생하려면 이 권한이 있어야 한다
+  (2026-09-15 추가). Unity 기본 매니페스트엔 VIBRATE 권한이 없어서 별도로 선언함 —
+  이 파일은 빌드 시 Unity가 생성하는 매니페스트와 자동으로 병합된다.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.VIBRATE" />
+</manifest>

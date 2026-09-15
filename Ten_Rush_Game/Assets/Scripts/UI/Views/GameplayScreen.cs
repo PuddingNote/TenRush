@@ -95,6 +95,12 @@ namespace TenRush.UI.Views
         /// <summary>타이머가 0에 닿은 순간. 아직 이번 판에서 연장 오퍼를 안 썼고 광고도 준비돼 있으면 오퍼부터 보여준다.</summary>
         private void HandleRoundEnded()
         {
+            // 연장 오퍼가 뜨든 바로 결과 화면으로 가든, "시간이 다 됐다"는 건 이 순간
+            // 확정이므로 진동은 여기서 한 번만 울린다. 사운드는 반대로 진짜 라운드가
+            // 끝나는 ShowResultsScreen에서만(연장 오퍼 중엔 안 울림) — 사용자 피드백
+            // (2026-09-15): 연장 오퍼 화면 = 진동 O/사운드 X, 결과 화면 = 진동 X/사운드 O.
+            HapticManager.PlayRoundEnd();
+
             if (!_timeExtensionOffered && AdManager.IsRewardedReady)
             {
                 _timeExtensionOffered = true;

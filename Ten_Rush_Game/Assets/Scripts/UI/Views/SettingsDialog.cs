@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace TenRush.UI.Views
 {
-    /// <summary>BGM/SFX On·Off + 볼륨 슬라이더. 닫기 버튼 하나만 있는 설정 다이얼로그.</summary>
+    /// <summary>BGM/SFX On·Off + 볼륨 슬라이더, 진동 On·Off. 닫기 버튼 하나만 있는 설정 다이얼로그.</summary>
     public sealed class SettingsDialog : MonoBehaviour
     {
         private Action _onClosed;
@@ -25,7 +25,7 @@ namespace TenRush.UI.Views
             // 필요 없는 지역 사용자는 그 버튼 자체가 안 생기고 아래쪽 여백만 남는다.
             var cardRect = UiFactory.CreatePanel(rootRect, "Card", UiTheme.BoardBackground, UiSprites.Dialog);
             UiFactory.SetAnchor(cardRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            UiFactory.SetSize(cardRect, 920f, 860f);
+            UiFactory.SetSize(cardRect, 920f, 1030f); // 진동 On/Off 줄 추가로 170 더 키움(줄 간격 170 유지)
 
             var title = UiFactory.CreateText(cardRect, "Title", "SETTINGS", 64f, UiTheme.Ink);
             UiFactory.SetAnchor(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
@@ -51,6 +51,12 @@ namespace TenRush.UI.Views
                 AudioSettingsStore.SfxEnabled, AudioSettingsStore.SfxVolume,
                 enabled => AudioSettingsStore.SfxEnabled = enabled,
                 volume => AudioSettingsStore.SfxVolume = volume);
+
+            // 진동은 볼륨 개념이 없어서 슬라이더 없이 On/Off 토글만.
+            CreateToggleRow(
+                cardRect, "VIBRATION", -600f,
+                HapticSettingsStore.Enabled,
+                enabled => HapticSettingsStore.Enabled = enabled);
 
             // EEA/영국처럼 UMP 동의 폼을 보여준 지역의 사용자에게만 보이는 진입점 —
             // 나중에 동의 선택을 바꿀 수 있어야 한다는 게 Google 정책 요건.
@@ -98,10 +104,29 @@ namespace TenRush.UI.Views
             slider.onValueChanged.AddListener(v => onVolume?.Invoke(v));
         }
 
-        private static Button CreateToggleButton(Transform parent, string name, bool initialOn, Action<bool> onChanged)
+        /// <summary>라벨 + On/Off 토글만 있는 한 줄(슬라이더 없음) — 진동처럼 볼륨 개념이 없는 항목용.</summary>
+        private static void CreateToggleRow(
+            Transform card,
+            string label,
+            float rowCenterY,
+            bool initialEnabled,
+            Action<bool> onToggle)
+        {
+            var labelText = UiFactory.CreateText(card, $"{label}Label", label, 44f, UiTheme.Ink, TextAlignmentOptions.Left);
+            UiFactory.SetAnchor(labelText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 0.5f));
+            UiFactory.SetAnchoredPosition(labelText.rectTransform, 60f, rowCenterY);
+            UiFactory.SetSize(labelText.rectTransform, 320f, 70f); // "VIBRATION"까지 안 잘리게 BGM/SFX 줄보다 넓게
+
+            var toggleButton = CreateToggleButton(card, $"{label}Toggle", initialEnabled, onToggle, 200f);
+            var toggleRect = (RectTransform)toggleButton.transform;
+            UiFactory.SetAnchor(toggleRect, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 0.5f));
+            UiFactory.SetAnchoredPosition(toggleRect, 460f, rowCenterY);
+        }
+
+        private static Button CreateToggleButton(Transform parent, string name, bool initialOn, Action<bool> onChanged, float width = 150f)
         {
             bool isOn = initialOn;
-            var button = UiFactory.CreateButton(parent, name, isOn ? "ON" : "OFF", 150f, 90f, isOn ? UiTheme.Accent : UiTheme.SubInk, Color.black, UiTheme.DialogButtonFontSize);
+            var button = UiFactory.CreateButton(parent, name, isOn ? "ON" : "OFF", width, 90f, isOn ? UiTheme.Accent : UiTheme.SubInk, Color.black, UiTheme.DialogButtonFontSize);
             var label = button.GetComponentInChildren<TextMeshProUGUI>();
             var image = button.GetComponent<Image>();
 

@@ -87,6 +87,7 @@ namespace TenRush.UI.Views
                     _tiles[result.MismatchTapped.Row, result.MismatchTapped.Col].PlayMismatchShake();
                     SetHighlight(null); // 선택을 완전히 해제 — 사용자 피드백으로 체이닝 제거(2026-08-14)
                     AudioManager.PlayMismatch();
+                    HapticManager.PlayMismatch();
                     break;
 
                 case TapOutcome.Matched:
