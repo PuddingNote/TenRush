@@ -122,6 +122,7 @@ namespace TenRush.UI.Views
         private void ShowResultsScreen()
         {
             _gameOverShown = true;
+            AudioManager.PlayRoundEnd();
             AdFrequencyStore.RecordRoundPlayed();
             int best = HighScoreStore.SaveIfHigher(_round.Score);
             _gameOverOverlay.Show(_round.Score, best);

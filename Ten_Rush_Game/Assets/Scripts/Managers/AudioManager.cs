@@ -46,40 +46,55 @@ namespace TenRush.Managers
             _bgmSource.volume = AudioSettingsStore.BgmEnabled ? baseVolume * AudioSettingsStore.BgmVolume : 0f;
         }
 
+        /// <summary>숫자 타일을 선택/해제할 때(아직 매치 결과가 나오기 전) — 기본 터치 피드백음.</summary>
+        public static void PlayTileSelect()
+        {
+            PlaySfx(_library != null ? _library.TileSelectSfx : null, BasePitch);
+        }
+
+        /// <summary>합이 10이 맞아서 두 타일이 매치됐을 때.</summary>
+        /// <remarks>
+        /// 콤보가 이어질수록 피치를 올리는 기능이 있었는데(2026-09-15 임시 비활성화)
+        /// — 실제 사운드로 들어보니 콤보 피치업 없이 들어보고 싶다는 요청으로 꺼둠.
+        /// 되살리려면 아래 주석 처리된 줄로 pitch를 계산하면 됨.
+        /// </remarks>
         public static void PlayMatch(int comboCount)
         {
-            EnsureInitialized();
+            // float pitch = Mathf.Min(MaxPitch, BasePitch + (comboCount - 1) * PitchStepPerCombo);
+            PlaySfx(_library != null ? _library.MatchSuccessSfx : null, BasePitch);
+        }
 
-            if (!AudioSettingsStore.SfxEnabled)
-                return;
-
-            var clip = _library != null ? _library.MatchSfx : null;
-            if (clip == null)
-                return; // 클립을 안 넣어 뒀으면 그냥 무음.
-
-            float baseVolume = _library != null ? _library.SfxVolume : 1f;
-            float volume = baseVolume * AudioSettingsStore.SfxVolume;
-
-            _sfxSource.pitch = Mathf.Min(MaxPitch, BasePitch + (comboCount - 1) * PitchStepPerCombo);
-            _sfxSource.PlayOneShot(clip, volume);
+        /// <summary>합이 10이 아니라서 매치가 실패했을 때.</summary>
+        public static void PlayMismatch()
+        {
+            PlaySfx(_library != null ? _library.MatchFailSfx : null, BasePitch);
         }
 
         /// <summary>버튼(타일 제외 — UiFactory.CreateButton으로 만든 모든 버튼)을 누를 때마다 자동 재생.</summary>
         public static void PlayButtonClick()
         {
+            PlaySfx(_library != null ? _library.ButtonClickSfx : null, BasePitch);
+        }
+
+        /// <summary>라운드가 최종 종료되어(연장 없이) 결과 화면으로 넘어가는 순간.</summary>
+        public static void PlayRoundEnd()
+        {
+            PlaySfx(_library != null ? _library.RoundEndSfx : null, BasePitch);
+        }
+
+        private static void PlaySfx(AudioClip clip, float pitch)
+        {
             EnsureInitialized();
 
             if (!AudioSettingsStore.SfxEnabled)
                 return;
 
-            var clip = _library != null ? _library.ButtonClickSfx : null;
             if (clip == null)
                 return; // 클립을 안 넣어 뒀으면 그냥 무음.
 
             float baseVolume = _library != null ? _library.SfxVolume : 1f;
             float volume = baseVolume * AudioSettingsStore.SfxVolume;
-
-            _sfxSource.pitch = BasePitch;
+            _sfxSource.pitch = pitch;
             _sfxSource.PlayOneShot(clip, volume);
         }
 

@@ -73,6 +73,9 @@ namespace TenRush.UI.Views
             {
                 case TapOutcome.Selected:
                     SetHighlight(result.Selected);
+                    // 타일 선택음(AudioManager.PlayTileSelect)은 2026-09-15에 뺐음 — 한 판에
+                    // 타일을 워낙 많이 선택하다 보니 같은 소리가 너무 반복돼서 거슬린다는
+                    // 피드백. 라이브러리/메서드는 남겨 뒀으니 필요하면 바로 되살릴 수 있음.
                     break;
 
                 case TapOutcome.Deselected:
@@ -83,6 +86,7 @@ namespace TenRush.UI.Views
                     _tiles[result.MismatchPrevious.Row, result.MismatchPrevious.Col].PlayMismatchShake();
                     _tiles[result.MismatchTapped.Row, result.MismatchTapped.Col].PlayMismatchShake();
                     SetHighlight(null); // 선택을 완전히 해제 — 사용자 피드백으로 체이닝 제거(2026-08-14)
+                    AudioManager.PlayMismatch();
                     break;
 
                 case TapOutcome.Matched:
